@@ -17,7 +17,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
   const [projectDetails, setProjectDetails] = useState<
     ProjectDetails | undefined
   >({
-    projectName: "", // Set initial values
+    projectName: "",
     projectDescription: "",
     invitedEmails: [],
   });
@@ -29,15 +29,15 @@ const ProjectCreationForm: React.FC<{}> = () => {
     const projectDetails: ProjectDetails = {
       projectName,
       projectDescription,
-      invitedEmails: [], // Initialize empty array for invited emails
+      invitedEmails: [],
     };
 
-    // Store project details in local storage
     localStorage.setItem(projectName, JSON.stringify(projectDetails));
     setProjectDetails(projectDetails);
+    console.log(projectDetails);
 
     console.log("Project created:", projectName, projectDescription);
-    navigate(`/project/${projectName}`);
+    navigate(`/project/${projectName}`, { state: { projectDetails } });
   };
 
   return (

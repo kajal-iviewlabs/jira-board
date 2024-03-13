@@ -1,6 +1,4 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Header from "./Header";
 import Home from "../pages/Home";
 import { useAuth0 } from "@auth0/auth0-react";
 import ProjectPage from "../pages/Project";
