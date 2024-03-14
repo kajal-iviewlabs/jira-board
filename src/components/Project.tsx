@@ -7,7 +7,6 @@ const Project = () => {
     <>
       <div className="project-dropDown-container">
         <div className="project-task">RECENT</div>
-        <div>Project List</div>
         <div className="project-block" role="group">
           <span>
             <a className="projects-link" href="/jira/projects" target="_self">
@@ -16,7 +15,9 @@ const Project = () => {
               </Link>
             </a>
             <button className="projects-link">
-              <span className="project-dropdown-text">Create project</span>
+              <Link to="create" className="project-dropdown-text">
+                Create project
+              </Link>
             </button>
           </span>
         </div>

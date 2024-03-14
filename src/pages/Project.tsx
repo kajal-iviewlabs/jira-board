@@ -64,12 +64,23 @@ const ProjectPage: React.FC = () => {
 
   const handleTaskSubmission = (newTaskData: TaskData) => {
     setTaskData((prevTaskData) => [...prevTaskData, newTaskData]);
+
     const updatedProjectDetails = {
       ...projectDetails,
       taskData: [...projectDetails.taskData, newTaskData],
     };
+
+    // Update local storage only with the updated task data
     if (projectName) {
-      localStorage.setItem(projectName, JSON.stringify(updatedProjectDetails));
+      const projectDetailsString = localStorage.getItem(projectName);
+      if (projectDetailsString) {
+        const existingProjectDetails = JSON.parse(projectDetailsString);
+        const updatedLocalStorage = {
+          ...existingProjectDetails,
+          taskData: [...existingProjectDetails.taskData, newTaskData],
+        };
+        localStorage.setItem(projectName, JSON.stringify(updatedLocalStorage));
+      }
     } else {
       console.error("Project name is undefined.");
     }
@@ -91,7 +102,7 @@ const ProjectPage: React.FC = () => {
           <p className="mb-4">{projectDetails.projectDescription}</p>
           <InviteForm onSubmit={handleInvite} />
         </div>
-        <div className="bg-gray-100 py-4 px-6">
+        {/* <div className="bg-gray-100 py-4 px-6">
           <h2 className="text-lg font-semibold mb-4">Project Partners:</h2>
           <ul>
             {invitedEmails.map((email, index) => (
@@ -100,7 +111,7 @@ const ProjectPage: React.FC = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
         <div className="bg-gray-100 py-4 px-6">
           <h2 className="text-lg font-semibold mb-4">Task Data:</h2>
           {taskData.map((task, index) => (

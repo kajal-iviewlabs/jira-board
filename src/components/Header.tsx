@@ -20,6 +20,12 @@ const Header = () => {
     setprojectDropDown(!projectDropDown);
   };
 
+  const closeProjectDropDown = () => {
+    setTimeout(() => {
+      setprojectDropDown(false);
+    }, 2000);
+  };
+
   const getFirstLetter = (name: string) => {
     if (name) {
       console.log(name);
@@ -51,8 +57,12 @@ const Header = () => {
 
               {/* Projects */}
               <div role="listitem" className="div-btn">
-                <div className="inner-div" onMouseEnter={toggleprojectDropDown}>
-                  <Link to="projects" className="projects">
+                <div
+                  className="inner-div"
+                  onMouseEnter={toggleprojectDropDown}
+                  onMouseLeave={closeProjectDropDown}
+                >
+                  <Link to="view" className="projects">
                     Projects
                   </Link>
                   <ArrowIcon />
@@ -60,7 +70,7 @@ const Header = () => {
                 {projectDropDown && <Project />}
               </div>
 
-              {/* More */}
+              {/* More
               <div role="listitem" className="div-btn">
                 <div className="inner-div">
                   <Link to="more" className="more">
@@ -70,7 +80,7 @@ const Header = () => {
                     <ArrowIcon />
                   </span>
                 </div>
-              </div>
+              </div> */}
 
               {/* create */}
               <div role="listitem" className="div-btn">
@@ -78,7 +88,6 @@ const Header = () => {
                   <Link to="create" className="create">
                     Create
                   </Link>
-                  <ArrowIcon />
                 </div>
               </div>
             </div>

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface InviteFormProps {
   onSubmit: (email: string) => void;
@@ -11,6 +13,20 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
   const [isValidEmail, setIsValidEmail] = useState<boolean>(true);
 
   const handleInvite = () => {
+    if (!email.trim()) {
+      toast.error("Please enter an email address", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+
     if (!projectName || !isValidEmail) {
       return;
     }
@@ -55,6 +71,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
       >
         Invite
       </button>
+      <ToastContainer />
     </div>
   );
 };
