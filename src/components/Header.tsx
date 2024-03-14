@@ -115,23 +115,21 @@ const Header = () => {
                       </button>
                       {dropdownOpen && (
                         <div className="dropdown-content">
-                          <div className="dropdown-user-container">
-                            <div className="dropdown-name">Account</div>
-                            <div className="dropdown-user-details">
-                              <button
-                                className="login-btn"
-                                onClick={toggleDropdown}
-                              >
-                                {user && user.name ? (
-                                  <div className="login-initial">
-                                    {getFirstLetter(user.name)}
-                                  </div>
-                                ) : (
-                                  "Log In"
-                                )}
-                              </button>
-                              <p>{user?.name}</p>
-                            </div>
+                          <div className="dropdown-name">Account</div>
+                          <div className="dropdown-user-details">
+                            <button
+                              className="login-btn"
+                              onClick={toggleDropdown}
+                            >
+                              {user && user.name ? (
+                                <div className="login-initial">
+                                  {getFirstLetter(user.name)}
+                                </div>
+                              ) : (
+                                "Log In"
+                              )}
+                            </button>
+                            <p>{user?.name}</p>
                           </div>
 
                           {/* logout btn */}

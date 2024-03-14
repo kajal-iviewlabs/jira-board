@@ -5,6 +5,7 @@ type ProjectDetails = {
   projectName: string;
   projectDescription: string;
   invitedEmails: string[];
+  taskData: [];
 };
 
 const ProjectDetailsContext = createContext<ProjectDetails | undefined>(
@@ -20,6 +21,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
     projectName: "",
     projectDescription: "",
     invitedEmails: [],
+    taskData: [],
   });
   const navigate = useNavigate();
 
@@ -30,6 +32,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
       projectName,
       projectDescription,
       invitedEmails: [],
+      taskData: [],
     };
 
     localStorage.setItem(projectName, JSON.stringify(projectDetails));
