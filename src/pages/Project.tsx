@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import InviteForm from "../components/InviteForm";
-import TaskModal from "../components/TaskModal";
+import { useParams } from "react-router-dom";
+import InviteForm from "../components/invitePeople/InviteForm";
+import TaskModal from "../components/projectForm/TaskModal";
 import {
   DragDropContext,
   Droppable,
@@ -21,19 +21,13 @@ interface TaskData {
 
 const ProjectPage: React.FC = () => {
   const { projectName } = useParams<{ projectName: string }>();
-  const location = useLocation();
-  const projectDetails = location.state?.projectDetails || {
-    projectName: "",
-    projectDescription: "",
-    invitedEmails: [],
-    taskData: [],
-  };
   const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [taskData, setTaskData] = useState<TaskData[]>([]);
   const [progressData, setProgressData] = useState<TaskData[]>([]);
   const [completedData, setCompletedData] = useState<TaskData[]>([]);
   const taskListRef = useRef<HTMLDivElement>(null);
+  const projectDetails = projectName ? localStorage.getItem(projectName) : null;
 
   useEffect(() => {
     if (projectName) {
@@ -75,11 +69,6 @@ const ProjectPage: React.FC = () => {
 
   const handleTaskSubmission = (newTaskData: TaskData) => {
     setTaskData((prevTaskData) => [...prevTaskData, newTaskData]);
-
-    const updatedProjectDetails = {
-      ...projectDetails,
-      taskData: [...projectDetails.taskData, newTaskData],
-    };
 
     if (projectName) {
       const projectDetailsString = localStorage.getItem(projectName);
@@ -159,6 +148,8 @@ const ProjectPage: React.FC = () => {
     // }
   };
 
+  console.log(projectDetails);
+
   return (
     <div
       className="flex justify-center items-center h-full p-10"
@@ -169,7 +160,7 @@ const ProjectPage: React.FC = () => {
         style={{ width: "200%" }}
       >
         <div className="p-6">
-          <div className="flex items-center gap-10">
+          <div className="flex justify-between items-center gap-10">
             <h1 className="text-2xl font-bold mb-4">{projectName}</h1>
             <button
               onClick={handleOpenTaskModal}
@@ -178,7 +169,11 @@ const ProjectPage: React.FC = () => {
               Create Task
             </button>
           </div>
-          <p className="mb-4">{projectDetails.projectDescription}</p>
+          <p className="mb-4">
+            {projectDetails
+              ? JSON.parse(projectDetails).projectDescription
+              : ""}
+          </p>
           <InviteForm onSubmit={handleInvite} />
         </div>
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -197,10 +192,12 @@ const ProjectPage: React.FC = () => {
                       overflowY: "auto",
                       width: "100%",
                       height: "100%",
-                      // ref: { taskListRef },
                     }}
+                    ref={taskListRef}
                   >
-                    <h2 className="text-lg font-semibold mb-4">To Do:</h2>
+                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+                      To Do:
+                    </h2>
                     {taskData.map((task, index) => (
                       <Draggable
                         key={task.id}
@@ -219,7 +216,6 @@ const ProjectPage: React.FC = () => {
                               </p>
                               <p>Description: {task.description}</p>
                               <p>Priority: {task.priority}</p>
-                              <p>Assignee: {task.assignee}</p>
                               <p>Duration: {task.duration}</p>
                             </div>
                           </div>
@@ -247,7 +243,9 @@ const ProjectPage: React.FC = () => {
                       height: "100%",
                     }}
                   >
-                    <h2 className="text-lg font-semibold mb-4">In Progress:</h2>
+                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+                      In Progress:
+                    </h2>
                     {progressData?.map((task, index) => (
                       <Draggable
                         key={task.id}
@@ -294,7 +292,9 @@ const ProjectPage: React.FC = () => {
                       height: "100%",
                     }}
                   >
-                    <h2 className="text-lg font-semibold mb-4">Done:</h2>
+                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+                      Done:
+                    </h2>
                     {completedData?.map((task, index) => (
                       <Draggable
                         key={task.id}

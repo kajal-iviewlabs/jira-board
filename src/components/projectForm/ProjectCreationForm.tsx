@@ -27,19 +27,21 @@ const ProjectCreationForm: React.FC<{}> = () => {
   const navigate = useNavigate();
 
   const handleCreateProject = () => {
+    const projectOwner: string = user?.name || "";
+    console.log(projectStatus);
+
     const projectDetails: ProjectDetails = {
       projectName,
       projectDescription,
       projectStartDate,
       projectEndDate,
-      projectOwner: user ? user.name : "", // Assuming Auth0 returns user ID as 'sub'
+      projectOwner,
       projectStatus,
       invitedEmails: [],
       taskData: [],
     };
 
     localStorage.setItem(projectName, JSON.stringify(projectDetails));
-    console.log("Project created:", projectDetails);
     navigate(`/project/${projectName}`, { state: { projectDetails } });
   };
 
@@ -81,13 +83,17 @@ const ProjectCreationForm: React.FC<{}> = () => {
             placeholder="End Date"
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
           />
-          <input
-            type="text"
+          <select
             value={projectStatus}
             onChange={(e) => setProjectStatus(e.target.value)}
-            placeholder="Project Status"
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-          />
+          >
+            <option value="active">Not Selected</option>
+            <option value="active">Active</option>
+            <option value="progress">In Progress</option>
+            <option value="complete">Complete</option>
+          </select>
+
           <button
             onClick={handleCreateProject}
             className="w-full px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none"

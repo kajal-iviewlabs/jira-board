@@ -1,11 +1,10 @@
 import { useState } from "react";
 import "./header.css";
 import { useAuth0 } from "@auth0/auth0-react";
-import Project from "./Project";
+import Project from "../projectForm/Project";
 import { Link } from "react-router-dom";
-import HomeIcon from "../assets/HomeIcon";
-import ArrowIcon from "../assets/ArrowIcon";
-import SearchIcon from "../assets/SearchIcon";
+import HomeIcon from "../../assets/HomeIcon";
+import ArrowIcon from "../../assets/ArrowIcon";
 
 const Header = () => {
   const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
@@ -28,7 +27,6 @@ const Header = () => {
 
   const getFirstLetter = (name: string) => {
     if (name) {
-      console.log(name);
       return name.charAt(0).toUpperCase();
     }
     return "";
@@ -70,18 +68,6 @@ const Header = () => {
                 {projectDropDown && <Project />}
               </div>
 
-              {/* More
-              <div role="listitem" className="div-btn">
-                <div className="inner-div">
-                  <Link to="more" className="more">
-                    More
-                  </Link>
-                  <span className="more-span">
-                    <ArrowIcon />
-                  </span>
-                </div>
-              </div> */}
-
               {/* create */}
               <div role="listitem" className="div-btn">
                 <div className="inner-div">
@@ -94,22 +80,8 @@ const Header = () => {
           </nav>
           <div className="header-right">
             <div className="inner-right-header">
-              {/* <div role="presentation">
-                <div role="search" className="search-img-div">
-                  <span className="search-img">
-                    <SearchIcon />
-                  </span>
-                  <input
-                    className="search-input"
-                    placeholder="Search"
-                    // maxLength="500"
-                    // value=""
-                  />
-                </div>
-              </div> */}
               <div>
                 {/* Login DropDown */}
-
                 {isAuthenticated ? (
                   <div>
                     <div className="dropdown">
