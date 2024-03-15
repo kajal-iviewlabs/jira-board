@@ -24,7 +24,6 @@ const LeftMenu = () => {
   const handleButtonClick = () => {
     setIsHovered(true);
     setIsDropdownOpen(!isDropdownOpen);
-    console.log("btn clicked");
   };
 
   return (

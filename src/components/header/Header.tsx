@@ -1,11 +1,10 @@
 import { useState } from "react";
 import "./header.css";
 import { useAuth0 } from "@auth0/auth0-react";
-import Project from "./Project";
+import Project from "../projectForm/Project";
 import { Link } from "react-router-dom";
-import HomeIcon from "../assets/HomeIcon";
-import ArrowIcon from "../assets/ArrowIcon";
-import SearchIcon from "../assets/SearchIcon";
+import HomeIcon from "../../assets/HomeIcon";
+import ArrowIcon from "../../assets/ArrowIcon";
 
 const Header = () => {
   const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
@@ -20,9 +19,14 @@ const Header = () => {
     setprojectDropDown(!projectDropDown);
   };
 
+  const closeProjectDropDown = () => {
+    setTimeout(() => {
+      setprojectDropDown(false);
+    }, 2000);
+  };
+
   const getFirstLetter = (name: string) => {
     if (name) {
-      console.log(name);
       return name.charAt(0).toUpperCase();
     }
     return "";
@@ -51,25 +55,17 @@ const Header = () => {
 
               {/* Projects */}
               <div role="listitem" className="div-btn">
-                <div className="inner-div" onMouseEnter={toggleprojectDropDown}>
-                  <Link to="projects" className="projects">
+                <div
+                  className="inner-div"
+                  onMouseEnter={toggleprojectDropDown}
+                  onMouseLeave={closeProjectDropDown}
+                >
+                  <Link to="view" className="projects">
                     Projects
                   </Link>
                   <ArrowIcon />
                 </div>
                 {projectDropDown && <Project />}
-              </div>
-
-              {/* More */}
-              <div role="listitem" className="div-btn">
-                <div className="inner-div">
-                  <Link to="more" className="more">
-                    More
-                  </Link>
-                  <span className="more-span">
-                    <ArrowIcon />
-                  </span>
-                </div>
               </div>
 
               {/* create */}
@@ -78,29 +74,14 @@ const Header = () => {
                   <Link to="create" className="create">
                     Create
                   </Link>
-                  <ArrowIcon />
                 </div>
               </div>
             </div>
           </nav>
           <div className="header-right">
             <div className="inner-right-header">
-              <div role="presentation">
-                <div role="search" className="search-img-div">
-                  <span className="search-img">
-                    <SearchIcon />
-                  </span>
-                  <input
-                    className="search-input"
-                    placeholder="Search"
-                    // maxLength="500"
-                    // value=""
-                  />
-                </div>
-              </div>
               <div>
                 {/* Login DropDown */}
-
                 {isAuthenticated ? (
                   <div>
                     <div className="dropdown">
@@ -115,23 +96,21 @@ const Header = () => {
                       </button>
                       {dropdownOpen && (
                         <div className="dropdown-content">
-                          <div className="dropdown-user-container">
-                            <div className="dropdown-name">Account</div>
-                            <div className="dropdown-user-details">
-                              <button
-                                className="login-btn"
-                                onClick={toggleDropdown}
-                              >
-                                {user && user.name ? (
-                                  <div className="login-initial">
-                                    {getFirstLetter(user.name)}
-                                  </div>
-                                ) : (
-                                  "Log In"
-                                )}
-                              </button>
-                              <p>{user?.name}</p>
-                            </div>
+                          <div className="dropdown-name">Account</div>
+                          <div className="dropdown-user-details">
+                            <button
+                              className="login-btn"
+                              onClick={toggleDropdown}
+                            >
+                              {user && user.name ? (
+                                <div className="login-initial">
+                                  {getFirstLetter(user.name)}
+                                </div>
+                              ) : (
+                                "Log In"
+                              )}
+                            </button>
+                            <p>{user?.name}</p>
                           </div>
 
                           {/* logout btn */}
