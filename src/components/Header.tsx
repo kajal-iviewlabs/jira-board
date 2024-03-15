@@ -94,7 +94,7 @@ const Header = () => {
           </nav>
           <div className="header-right">
             <div className="inner-right-header">
-              <div role="presentation">
+              {/* <div role="presentation">
                 <div role="search" className="search-img-div">
                   <span className="search-img">
                     <SearchIcon />
@@ -106,7 +106,7 @@ const Header = () => {
                     // value=""
                   />
                 </div>
-              </div>
+              </div> */}
               <div>
                 {/* Login DropDown */}
 

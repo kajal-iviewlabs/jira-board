@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
 interface TaskData {
+  id: string;
   taskName: string;
   description: string;
   priority: string;
   assignee: string;
   duration: string;
+  status: string;
 }
 
 interface TaskModalProps {
@@ -27,11 +29,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   const handleCreateTask = () => {
     const taskData = {
+      id: Math.random().toString(36).substring(2, 11),
       taskName,
       description,
       priority,
       assignee,
       duration,
+      status: "",
     };
     onSubmitTask(taskData);
     onClose();
