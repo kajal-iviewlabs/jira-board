@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 interface TaskData {
   id: string;
@@ -11,7 +12,7 @@ interface TaskData {
 }
 
 interface TaskModalProps {
-  onSubmitTask: (newTaskData: TaskData) => void; // Add this line
+  onSubmitTask: (newTaskData: TaskData) => void;
   onClose: () => void;
   invitedEmails: string[];
 }
@@ -28,6 +29,27 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [duration, setDuration] = useState("");
 
   const handleCreateTask = () => {
+    // Validate email format
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = emailPattern.test(assignee);
+
+    // Validate duration format
+    const isDurationValid = /^\d+$/.test(duration);
+
+    if (!taskName || !description || !isEmailValid || !isDurationValid) {
+      toast.error("Please fill in all fields correctly.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+
     const taskData = {
       id: Math.random().toString(36).substring(2, 11),
       taskName,
@@ -116,7 +138,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                       Assignee
                     </label>
                     <input
-                      type="text"
+                      type="email" // Set type to "email" for email validation
                       name="assignee"
                       id="assignee"
                       list="emails"
@@ -125,6 +147,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                       placeholder="Enter assignee email"
                       value={assignee}
                       onChange={(e) => setAssignee(e.target.value)}
+                      pattern="[^\s@]+@[^\s@]+\.[^\s@]+" // Specify email pattern for validation
                     />
                     <datalist id="emails">
                       {invitedEmails.map((email, index) => (
@@ -137,10 +160,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
                       htmlFor="duration"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Duration
+                      Duration [Days]
                     </label>
                     <input
-                      type="text"
+                      type="number" // Set type to "number" for numeric input
                       name="duration"
                       id="duration"
                       className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md px-3 py-2 border"
@@ -170,6 +193,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

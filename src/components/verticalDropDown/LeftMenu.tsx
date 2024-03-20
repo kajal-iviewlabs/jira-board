@@ -60,7 +60,7 @@ const LeftMenu = () => {
       </button>
       {isDropdownOpen && (
         <>
-          <div className="dropdown1">dropdown content</div>
+          <div className="dropdown1"></div>
         </>
       )}
     </>

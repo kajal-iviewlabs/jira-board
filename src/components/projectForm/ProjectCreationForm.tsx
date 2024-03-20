@@ -1,6 +1,7 @@
 import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import firebase from "../../firebaseConfig";
 
 type ProjectDetails = {
   projectName: string;
@@ -26,9 +27,8 @@ const ProjectCreationForm: React.FC<{}> = () => {
   const [projectStatus, setProjectStatus] = useState<string>("");
   const navigate = useNavigate();
 
-  const handleCreateProject = () => {
+  const handleCreateProject = async () => {
     const projectOwner: string = user?.name || "";
-    console.log(projectStatus);
 
     const projectDetails: ProjectDetails = {
       projectName,
@@ -41,21 +41,43 @@ const ProjectCreationForm: React.FC<{}> = () => {
       taskData: [],
     };
 
-    localStorage.setItem(projectName, JSON.stringify(projectDetails));
-    navigate(`/project/${projectName}`, { state: { projectDetails } });
+    try {
+      const resp = await fetch(
+        `https://project-management-tool-2dcae-default-rtdb.firebaseio.com/${user?.name}.json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({ projectDetails }),
+        }
+      );
+
+      if (resp.ok) {
+        alert("Data stored successfully");
+      } else {
+        alert("Error storing data");
+      }
+
+      navigate(`/project/${projectName}`, { state: { projectDetails } });
+    } catch (error) {
+      console.error("Error storing project details:", error);
+      alert("An error occurred while storing project details");
+    }
   };
 
   return (
     <ProjectDetailsContext.Provider value={undefined}>
       <div className="flex justify-center items-center h-full py-10">
         <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md">
-          <h1 className="text-2xl font-semibold mb-4 text-center">
+          <h1 className="text-2xl text-blue-900 font-semibold mb-4 text-center">
             Create a New Project
           </h1>
           <p className="text-sm text-gray-600 mb-6">
             Fill out the form below to create a new project and start
             collaborating with your team!
           </p>
+          <label className="text-blue-900">Project Title</label>
           <input
             type="text"
             value={projectName}
@@ -63,12 +85,14 @@ const ProjectCreationForm: React.FC<{}> = () => {
             placeholder="Project Name"
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
           />
+          <label className="text-blue-900">Project Description</label>
           <textarea
             value={projectDescription}
             onChange={(e) => setProjectDescription(e.target.value)}
             placeholder="Project Description"
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
           />
+          <label className="text-blue-900">Start Date</label>
           <input
             type="date"
             value={projectStartDate}
@@ -76,6 +100,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
             placeholder="Start Date"
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
           />
+          <label className="text-blue-900">End Date</label>
           <input
             type="date"
             value={projectEndDate}
@@ -83,12 +108,12 @@ const ProjectCreationForm: React.FC<{}> = () => {
             placeholder="End Date"
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
           />
+          <label className="text-blue-900">Project Status</label>
           <select
             value={projectStatus}
             onChange={(e) => setProjectStatus(e.target.value)}
             className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
           >
-            <option value="active">Not Selected</option>
             <option value="active">Active</option>
             <option value="progress">In Progress</option>
             <option value="complete">Complete</option>

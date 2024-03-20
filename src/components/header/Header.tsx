@@ -11,6 +11,19 @@ const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [projectDropDown, setprojectDropDown] = useState(false);
 
+  const loginHandler = () => {
+    loginWithRedirect();
+  };
+
+  const logoutHandler = () => {
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
+    localStorage.removeItem("token");
+  };
+
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
@@ -38,11 +51,13 @@ const Header = () => {
         <header className="header">
           <nav className="header-left">
             <div role="presentation">
-              <HomeIcon />
+              <Link to="view">
+                <HomeIcon />
+              </Link>
             </div>
             <div className="outer-menu">
               {/* Your Work */}
-              <div role="listitem" className="div-btn">
+              {/* <div role="listitem" className="div-btn">
                 <div className="inner-div">
                   <Link to="work" className="work">
                     Your work
@@ -51,7 +66,7 @@ const Header = () => {
                     <ArrowIcon />
                   </span>
                 </div>
-              </div>
+              </div> */}
 
               {/* Projects */}
               <div role="listitem" className="div-btn">
@@ -116,13 +131,7 @@ const Header = () => {
                           {/* logout btn */}
                           <button
                             className="logout-btn"
-                            onClick={() =>
-                              logout({
-                                logoutParams: {
-                                  returnTo: window.location.origin,
-                                },
-                              })
-                            }
+                            onClick={logoutHandler}
                           >
                             Log Out
                           </button>
@@ -132,7 +141,7 @@ const Header = () => {
                   </div>
                 ) : (
                   <div>
-                    <button onClick={() => loginWithRedirect()}>Log In</button>
+                    <button onClick={loginHandler}>Log In</button>
                   </div>
                 )}
               </div>

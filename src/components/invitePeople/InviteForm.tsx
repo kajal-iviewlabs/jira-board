@@ -31,6 +31,16 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
       return;
     }
 
+    toast.success(`${email} invited`, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
     onSubmit(email);
     setEmail("");
     setIsValidEmail(true);
@@ -49,19 +59,19 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
   };
 
   return (
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row mt-6 items-center">
       <input
         type="email"
         value={email}
         onChange={handleChange}
-        placeholder="Enter email address"
-        className={`flex-grow px-4 py-2 mr-6 border rounded-md focus:outline-none ${
+        placeholder="Invite people"
+        className={`flex-grow px-4 py-2 mr-4 border rounded-md focus:outline-none ${
           isValidEmail ? "border-gray-300" : "border-red-500"
         }`}
         required
       />
       {!isValidEmail && (
-        <p className="text-red-500 text-sm">
+        <p className="text-red-500 mr-4 text-sm">
           Please enter a valid email address
         </p>
       )}

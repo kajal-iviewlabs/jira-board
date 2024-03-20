@@ -1,4 +1,3 @@
-// Layout.js
 import { Routes, Route } from "react-router-dom";
 import ProjectPage from "../../pages/Project";
 import ProjectListPage from "../../pages/ProjectListPage";

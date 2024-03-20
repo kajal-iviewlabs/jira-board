@@ -1,10 +1,15 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const PrivateRoute = () => {
-  const { isAuthenticated } = useAuth0();
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
+      window.location.href = "/";
+    }
+  }, []);
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
+  return <Outlet />;
 };
 
 export default PrivateRoute;

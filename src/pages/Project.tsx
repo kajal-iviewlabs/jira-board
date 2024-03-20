@@ -8,6 +8,10 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import { FaExclamationCircle, FaRegCircle, FaCircle } from "react-icons/fa";
+import { database } from "../firebaseConfig";
+import { ref } from "firebase/database";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface TaskData {
   id: string;
@@ -19,6 +23,10 @@ interface TaskData {
   status: string;
 }
 
+interface PriorityIconMap {
+  [key: string]: any;
+}
+
 const ProjectPage: React.FC = () => {
   const { projectName } = useParams<{ projectName: string }>();
   const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
@@ -28,34 +36,46 @@ const ProjectPage: React.FC = () => {
   const [completedData, setCompletedData] = useState<TaskData[]>([]);
   const taskListRef = useRef<HTMLDivElement>(null);
   const projectDetails = projectName ? localStorage.getItem(projectName) : null;
+  const priorityIconMap: PriorityIconMap = {
+    high: <FaExclamationCircle color="red" />,
+    medium: <FaRegCircle color="orange" />,
+    low: <FaCircle color="green" />,
+  };
+  const { user } = useAuth0();
 
   useEffect(() => {
-    if (projectName) {
-      const projectDetailsString = localStorage.getItem(projectName);
-      if (projectDetailsString) {
-        const projectDetails = JSON.parse(projectDetailsString);
-        setInvitedEmails(projectDetails.invitedEmails || []);
-        setTaskData(projectDetails.taskData || []);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `https://project-management-tool-2dcae-default-rtdb.firebaseio.com/${projectName}.json`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch project details");
+        }
+
+        const projectDetails = await response.json();
+        if (projectDetails) {
+          setInvitedEmails(projectDetails.invitedEmails || []);
+          setTaskData(projectDetails.taskData || []);
+        }
+      } catch (error) {
+        console.error("Error fetching project details:", error);
       }
+    };
+    if (projectName) {
+      fetchData();
     }
   }, [projectName]);
 
   const handleInvite = (email: string) => {
     setInvitedEmails((prevInvitedEmails) => [...prevInvitedEmails, email]);
+    const db = database;
 
     if (projectName) {
-      const projectDetailsString = localStorage.getItem(projectName);
-      if (projectDetailsString) {
-        const projectDetails = JSON.parse(projectDetailsString);
-        const updatedProjectDetails = {
-          ...projectDetails,
-          invitedEmails: [...projectDetails.invitedEmails, email],
-        };
-        localStorage.setItem(
-          projectName,
-          JSON.stringify(updatedProjectDetails)
-        );
-      }
+      const projectRef = ref(db, user?.name);
+      console.log(projectRef.key);
+      // projectRef.child("invitedEmails").push(email);
     }
   };
 
@@ -148,20 +168,20 @@ const ProjectPage: React.FC = () => {
     // }
   };
 
-  console.log(projectDetails);
-
   return (
     <div
       className="flex justify-center items-center h-full p-10"
       style={{ width: "100%" }}
     >
       <div
-        className="mx-auto bg-white justify-center h-full items-center rounded-md shadow-md overflow-hidden"
+        className="mx-auto bg-white justify-center h-screen items-center rounded-md shadow-md overflow-hidden"
         style={{ width: "200%" }}
       >
         <div className="p-6">
           <div className="flex justify-between items-center gap-10">
-            <h1 className="text-2xl font-bold mb-4">{projectName}</h1>
+            <h1 className="text-2xl text-blue-900 font-bold mb-4">
+              {projectName}
+            </h1>
             <button
               onClick={handleOpenTaskModal}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -169,7 +189,7 @@ const ProjectPage: React.FC = () => {
               Create Task
             </button>
           </div>
-          <p className="mb-4">
+          <p className="mb-4 mt-4">
             {projectDetails
               ? JSON.parse(projectDetails).projectDescription
               : ""}
@@ -177,7 +197,7 @@ const ProjectPage: React.FC = () => {
           <InviteForm onSubmit={handleInvite} />
         </div>
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-3 gap-4 mx-6 rounded-md">
+          <div className="grid grid-cols-3 h-full mt-4 gap-4 mx-6 rounded-md">
             <Droppable droppableId="todo">
               {(provided) => (
                 <div
@@ -195,7 +215,7 @@ const ProjectPage: React.FC = () => {
                     }}
                     ref={taskListRef}
                   >
-                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+                    <h2 className="text-lg text-blue-900 font-semibold mb-4 border-b-2 border-gray-300 pb-2">
                       To Do:
                     </h2>
                     {taskData.map((task, index) => (
@@ -210,13 +230,20 @@ const ProjectPage: React.FC = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            <div className="bg-white shadow-md rounded-md p-4 mb-4">
+                            <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
                               <p className="font-semibold">
                                 Task Name: {task.taskName}
                               </p>
                               <p>Description: {task.description}</p>
-                              <p>Priority: {task.priority}</p>
+                              {/* <p>Priority: {task.priority}</p> */}
                               <p>Duration: {task.duration}</p>
+                              <div className="absolute bottom-1 right-2">
+                                {
+                                  priorityIconMap[
+                                    task.priority as keyof PriorityIconMap
+                                  ]
+                                }
+                              </div>
                             </div>
                           </div>
                         )}
@@ -243,7 +270,7 @@ const ProjectPage: React.FC = () => {
                       height: "100%",
                     }}
                   >
-                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+                    <h2 className="text-lg text-blue-900 font-semibold mb-4 border-b-2 border-gray-300 pb-2">
                       In Progress:
                     </h2>
                     {progressData?.map((task, index) => (
@@ -258,14 +285,19 @@ const ProjectPage: React.FC = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            <div className="bg-white shadow-md rounded-md p-4 mb-4">
+                            <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
                               <p className="font-semibold">
                                 Task Name: {task.taskName}
                               </p>
                               <p>Description: {task.description}</p>
-                              <p>Priority: {task.priority}</p>
-                              <p>Assignee: {task.assignee}</p>
                               <p>Duration: {task.duration}</p>
+                              <div className="absolute bottom-1 right-2">
+                                {
+                                  priorityIconMap[
+                                    task.priority as keyof PriorityIconMap
+                                  ]
+                                }
+                              </div>
                             </div>
                           </div>
                         )}
@@ -292,7 +324,7 @@ const ProjectPage: React.FC = () => {
                       height: "100%",
                     }}
                   >
-                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+                    <h2 className="text-lg text-blue-900 font-semibold mb-4 border-b-2 border-gray-300 pb-2">
                       Done:
                     </h2>
                     {completedData?.map((task, index) => (
@@ -307,14 +339,19 @@ const ProjectPage: React.FC = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            <div className="bg-white shadow-md rounded-md p-4 mb-4">
+                            <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
                               <p className="font-semibold">
                                 Task Name: {task.taskName}
                               </p>
                               <p>Description: {task.description}</p>
-                              <p>Priority: {task.priority}</p>
-                              <p>Assignee: {task.assignee}</p>
                               <p>Duration: {task.duration}</p>
+                              <div className="absolute bottom-1 right-2">
+                                {
+                                  priorityIconMap[
+                                    task.priority as keyof PriorityIconMap
+                                  ]
+                                }
+                              </div>
                             </div>
                           </div>
                         )}
