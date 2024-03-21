@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import InviteForm from "../components/invitePeople/InviteForm";
+import InviteForm from "../components/Task/InviteForm";
 import TaskModal from "../components/projectForm/TaskModal";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { FaExclamationCircle, FaRegCircle, FaCircle } from "react-icons/fa";
 import { database } from "../firebaseConfig";
 import { ref, update } from "firebase/database";
 import { useAuth0 } from "@auth0/auth0-react";
-import TaskList from "../components/taskList/TaskList";
+import TaskList from "../components/Task/TaskList";
 
 export interface TaskData {
   id: string;
@@ -92,13 +92,28 @@ const ProjectPage: React.FC = () => {
   }, [projectKey, projectDetails]);
 
   useEffect(() => {
-    // Fetch data from localStorage and update state
     const storedProjectKey = localStorage.getItem("projectKey");
     const storedProjectDetails = localStorage.getItem("projectDetails");
     if (storedProjectKey && storedProjectDetails) {
+      const parsedProjectDetails: ProjectDetails =
+        JSON.parse(storedProjectDetails);
       setProjectKey(storedProjectKey);
-      setProjectDetails(JSON.parse(storedProjectDetails));
-      setTaskData(JSON.parse(storedProjectDetails).taskData || []);
+      setProjectDetails(parsedProjectDetails);
+      if (parsedProjectDetails.taskData) {
+        const todoTasks = parsedProjectDetails.taskData.filter(
+          (task) => task.status === "todo"
+        );
+        const inProgressTasks = parsedProjectDetails.taskData.filter(
+          (task) => task.status === "inProgress"
+        );
+        const doneTasks = parsedProjectDetails.taskData.filter(
+          (task) => task.status === "done"
+        );
+
+        setTaskData(todoTasks);
+        setProgressData(inProgressTasks);
+        setCompletedData(doneTasks);
+      }
     }
   }, []);
 
@@ -163,6 +178,7 @@ const ProjectPage: React.FC = () => {
   };
 
   const handleDragEnd = (result: DropResult) => {
+    console.log("drang and drop happened");
     const { source, destination } = result;
     if (!destination) return;
     if (
@@ -172,49 +188,52 @@ const ProjectPage: React.FC = () => {
       return;
     }
 
+    let updatedTaskData = [...taskData];
+    let updatedProgressData = [...progressData];
+    let updatedCompletedData = [...completedData];
+    const draggedTask = updatedTaskData[source.index];
+
     // Remove the task from the source droppable area
-    let currentData,
-      active = taskData,
-      progress = progressData,
-      complete = completedData;
-
     if (source.droppableId === "todo") {
-      currentData = active[source.index];
-      active.splice(source.index, 1);
+      updatedTaskData.splice(source.index, 1);
     } else if (source.droppableId === "inProgress") {
-      currentData = progress[source.index];
-      progress.splice(source.index, 1);
+      updatedProgressData.splice(source.index, 1);
     } else {
-      currentData = complete[source.index];
-      complete.splice(source.index, 1);
+      updatedCompletedData.splice(source.index, 1);
     }
 
+    // Add the task to the destination droppable area
     if (destination.droppableId === "todo") {
-      active.splice(destination.index, 0, currentData);
+      updatedTaskData.splice(destination.index, 0, draggedTask);
+      draggedTask.status = "todo";
     } else if (destination.droppableId === "inProgress") {
-      progress.splice(destination.index, 0, currentData);
+      updatedProgressData.splice(destination.index, 0, draggedTask);
+      draggedTask.status = "inProgress";
     } else {
-      complete.splice(destination.index, 0, currentData);
+      updatedCompletedData.splice(destination.index, 0, draggedTask);
+      draggedTask.status = "done";
     }
 
-    setTaskData(active);
-    setProgressData(progress);
-    setCompletedData(complete);
+    const projectDetailsString = localStorage.getItem("projectDetails");
+    if (projectDetailsString) {
+      const projectDetails: ProjectDetails = JSON.parse(projectDetailsString);
+      const taskToUpdate = projectDetails.taskData.find(
+        (task) => task.id === draggedTask.id
+      );
+      console.log(taskToUpdate);
 
-    // Update the task's status based on the destination droppable area
-    // switch (destination.droppableId) {
-    //   case "todo":
-    //     active = { ...draggedTask, status: "todo" };
-    //     break;
-    //   case "inProgress":
-    //     updatedTask = { ...draggedTask, status: "inProgress" };
-    //     break;
-    //   case "done":
-    //     updatedTask = { ...draggedTask, status: "done" };
-    //     break;
-    //   default:
-    //     updatedTask = draggedTask;
-    // }
+      if (taskToUpdate) {
+        taskToUpdate.status = draggedTask.status;
+        localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
+        console.log(taskToUpdate);
+      }
+    }
+
+    setTaskData(updatedTaskData);
+    setProgressData(updatedProgressData);
+    setCompletedData(updatedCompletedData);
+
+    console.log("Updated Task:", draggedTask);
   };
 
   return (

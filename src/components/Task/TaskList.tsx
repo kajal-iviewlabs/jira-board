@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { TaskData } from "../../pages/Project";
 import { PriorityIconMap } from "../../pages/Project";
 import { Droppable, Draggable } from "react-beautiful-dnd";
+import SubTaskModal from "./subTaskModal";
 
 interface TaskListProps {
   taskData: TaskData[];
@@ -18,6 +19,18 @@ const TaskList: React.FC<TaskListProps> = ({
   priorityIconMap,
   taskListRef,
 }) => {
+  const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (task: TaskData) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedTask(null);
+    setIsModalOpen(false);
+  };
   return (
     <div className="grid grid-cols-3 h-full mt-4 gap-4 mx-6 rounded-md">
       <Droppable droppableId="todo">
@@ -47,6 +60,7 @@ const TaskList: React.FC<TaskListProps> = ({
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
+                      onClick={() => openModal(task)}
                     >
                       <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
                         <p className="font-semibold">
@@ -54,7 +68,7 @@ const TaskList: React.FC<TaskListProps> = ({
                         </p>
                         <p>Description: {task.description}</p>
                         {/* <p>Priority: {task.priority}</p> */}
-                        <p>Duration: {task.duration}</p>
+                        <p>Duration: {task.duration} days</p>
                         <div className="absolute bottom-1 right-2">
                           {
                             priorityIconMap[
@@ -67,6 +81,16 @@ const TaskList: React.FC<TaskListProps> = ({
                   )}
                 </Draggable>
               ))}
+              <SubTaskModal isOpen={isModalOpen} onClose={closeModal}>
+                <div>
+                  <p>Task Name: {selectedTask?.taskName}</p>
+                  <p>Description: {selectedTask?.description}</p>
+                  <p>assignee: {selectedTask?.assignee}</p>
+                  <p>duration: {selectedTask?.duration}</p>
+                  <p>status: {selectedTask?.status}</p>
+                </div>
+              </SubTaskModal>
+
               {provided.placeholder}
             </div>
           </div>
@@ -117,6 +141,16 @@ const TaskList: React.FC<TaskListProps> = ({
                   )}
                 </Draggable>
               ))}
+              <SubTaskModal isOpen={isModalOpen} onClose={closeModal}>
+                <div>
+                  <p>Task Name: {selectedTask?.taskName}</p>
+                  <p>Description: {selectedTask?.description}</p>
+                  <p>assignee: {selectedTask?.assignee}</p>
+                  <p>duration: {selectedTask?.duration}</p>
+                  <p>status: {selectedTask?.status}</p>
+                </div>
+              </SubTaskModal>
+
               {provided.placeholder}
             </div>
           </div>
@@ -167,6 +201,16 @@ const TaskList: React.FC<TaskListProps> = ({
                   )}
                 </Draggable>
               ))}
+              <SubTaskModal isOpen={isModalOpen} onClose={closeModal}>
+                <div>
+                  <p>Task Name: {selectedTask?.taskName}</p>
+                  <p>Description: {selectedTask?.description}</p>
+                  <p>assignee: {selectedTask?.assignee}</p>
+                  <p>duration: {selectedTask?.duration}</p>
+                  <p>status: {selectedTask?.status}</p>
+                </div>
+              </SubTaskModal>
+
               {provided.placeholder}
             </div>
           </div>

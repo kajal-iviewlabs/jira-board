@@ -57,7 +57,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       priority,
       assignee,
       duration,
-      status: "",
+      status: "todo",
     };
     onSubmitTask(taskData);
     onClose();
