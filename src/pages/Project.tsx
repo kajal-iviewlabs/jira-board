@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import InviteForm from "../components/Task/InviteForm";
-import TaskModal from "../components/projectForm/TaskModal";
+import TaskModal from "../components/Task/TaskModal";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { FaExclamationCircle, FaRegCircle, FaCircle } from "react-icons/fa";
 import { database } from "../firebaseConfig";
