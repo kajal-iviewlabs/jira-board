@@ -22,6 +22,8 @@ const Header = () => {
       },
     });
     localStorage.removeItem("token");
+    localStorage.removeItem("projectDetails");
+    localStorage.removeItem("projectKey");
   };
 
   const toggleDropdown = () => {

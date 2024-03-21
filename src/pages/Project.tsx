@@ -10,7 +10,7 @@ import {
 } from "react-beautiful-dnd";
 import { FaExclamationCircle, FaRegCircle, FaCircle } from "react-icons/fa";
 import { database } from "../firebaseConfig";
-import { ref } from "firebase/database";
+import { ref, update } from "firebase/database";
 import { useAuth0 } from "@auth0/auth0-react";
 
 interface TaskData {
@@ -21,6 +21,17 @@ interface TaskData {
   assignee: string;
   duration: string;
   status: string;
+}
+
+interface ProjectDetails {
+  projectName: string;
+  projectDescription: string;
+  projectStartDate: string;
+  projectEndDate: string;
+  projectOwner: string;
+  projectStatus: string;
+  invitedEmails: string[];
+  taskData: TaskData[];
 }
 
 interface PriorityIconMap {
@@ -35,7 +46,10 @@ const ProjectPage: React.FC = () => {
   const [progressData, setProgressData] = useState<TaskData[]>([]);
   const [completedData, setCompletedData] = useState<TaskData[]>([]);
   const taskListRef = useRef<HTMLDivElement>(null);
-  const projectDetails = projectName ? localStorage.getItem(projectName) : null;
+  const [projectKey, setProjectKey] = useState<string>("");
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(
+    null
+  );
   const priorityIconMap: PriorityIconMap = {
     high: <FaExclamationCircle color="red" />,
     medium: <FaRegCircle color="orange" />,
@@ -47,17 +61,22 @@ const ProjectPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://project-management-tool-2dcae-default-rtdb.firebaseio.com/${projectName}.json`
+          `https://project-management-tool-2dcae-default-rtdb.firebaseio.com/${user?.name}.json`
         );
-
         if (!response.ok) {
           throw new Error("Failed to fetch project details");
         }
-
-        const projectDetails = await response.json();
-        if (projectDetails) {
-          setInvitedEmails(projectDetails.invitedEmails || []);
-          setTaskData(projectDetails.taskData || []);
+        const data = await response.json();
+        for (const key in data) {
+          if (Object.prototype.hasOwnProperty.call(data, key)) {
+            const nestedObject = data[key];
+            if (nestedObject.projectName === projectName) {
+              setProjectDetails(nestedObject);
+              setProjectKey(key);
+              setTaskData(nestedObject.taskData || []);
+              break;
+            }
+          }
         }
       } catch (error) {
         console.error("Error fetching project details:", error);
@@ -68,14 +87,42 @@ const ProjectPage: React.FC = () => {
     }
   }, [projectName]);
 
+  useEffect(() => {
+    // Save projectKey and other necessary data to localStorage
+    if (projectKey && projectDetails) {
+      localStorage.setItem("projectKey", projectKey);
+      localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
+    }
+  }, [projectKey, projectDetails]);
+
+  useEffect(() => {
+    // Fetch data from localStorage and update state
+    const storedProjectKey = localStorage.getItem("projectKey");
+    const storedProjectDetails = localStorage.getItem("projectDetails");
+    if (storedProjectKey && storedProjectDetails) {
+      setProjectKey(storedProjectKey);
+      setProjectDetails(JSON.parse(storedProjectDetails));
+      setTaskData(JSON.parse(storedProjectDetails).taskData || []);
+    }
+  }, []);
+
   const handleInvite = (email: string) => {
     setInvitedEmails((prevInvitedEmails) => [...prevInvitedEmails, email]);
-    const db = database;
 
-    if (projectName) {
-      const projectRef = ref(db, user?.name);
-      console.log(projectRef.key);
-      // projectRef.child("invitedEmails").push(email);
+    if (projectDetails && projectKey) {
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+      const updatedProjectDetails = {
+        ...projectDetails,
+        invitedEmails: [...projectDetails.invitedEmails, email],
+      };
+
+      update(projectRef, updatedProjectDetails)
+        .then(() => {
+          console.log("Project details updated successfully.");
+        })
+        .catch((error) => {
+          console.error("Error updating project details:", error);
+        });
     }
   };
 
@@ -88,20 +135,26 @@ const ProjectPage: React.FC = () => {
   };
 
   const handleTaskSubmission = (newTaskData: TaskData) => {
-    setTaskData((prevTaskData) => [...prevTaskData, newTaskData]);
+    const updatedTaskData = [...taskData, newTaskData];
+    setTaskData(updatedTaskData);
 
-    if (projectName) {
-      const projectDetailsString = localStorage.getItem(projectName);
-      if (projectDetailsString) {
-        const existingProjectDetails = JSON.parse(projectDetailsString);
-        const updatedLocalStorage = {
-          ...existingProjectDetails,
-          taskData: [...existingProjectDetails.taskData, newTaskData],
-        };
-        localStorage.setItem(projectName, JSON.stringify(updatedLocalStorage));
-      }
+    if (projectKey && projectDetails) {
+      const updatedProjectDetails = {
+        ...projectDetails,
+        taskData: updatedTaskData,
+      };
+      setProjectDetails(updatedProjectDetails);
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+
+      update(projectRef, updatedProjectDetails)
+        .then(() => {
+          console.log("Task data updated successfully.");
+        })
+        .catch((error) => {
+          console.error("Error updating task data:", error);
+        });
     } else {
-      console.error("Project name is undefined.");
+      console.error("Project key or project details is undefined.");
     }
 
     // Scroll to bottom
@@ -190,9 +243,7 @@ const ProjectPage: React.FC = () => {
             </button>
           </div>
           <p className="mb-4 mt-4">
-            {projectDetails
-              ? JSON.parse(projectDetails).projectDescription
-              : ""}
+            {projectDetails ? projectDetails.projectDescription : ""}
           </p>
           <InviteForm onSubmit={handleInvite} />
         </div>
