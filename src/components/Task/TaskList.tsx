@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TaskData } from "../../pages/Project";
 import { PriorityIconMap } from "../../pages/Project";
 import { Droppable, Draggable } from "react-beautiful-dnd";
@@ -24,7 +24,36 @@ const TaskList: React.FC<TaskListProps> = ({
   const [isTodoModalOpen, setIsTodoModalOpen] = useState(false);
   const [isInProgressModalOpen, setIsInProgressModalOpen] = useState(false);
   const [isDoneModalOpen, setIsDoneModalOpen] = useState(false);
-  const projectDetails: ProjectDetails = localStorage.getItem("projectDetails");
+  const projectDetailsString = localStorage.getItem("projectDetails");
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState<string[]>([]);
+
+  useEffect(() => {
+    const storedComments = localStorage.getItem(`comments_${selectedTask?.id}`);
+    if (storedComments) {
+      setComments(JSON.parse(storedComments));
+    }
+  }, [selectedTask]);
+
+  const handleAddComment = () => {
+    const updatedComments = [...comments, newComment];
+    setComments(updatedComments);
+
+    if (selectedTask) {
+      localStorage.setItem(
+        `comments_${selectedTask.id}`,
+        JSON.stringify(updatedComments)
+      );
+    }
+
+    setNewComment("");
+  };
+
+  let projectDetails: ProjectDetails | null = null;
+
+  if (projectDetailsString) {
+    projectDetails = JSON.parse(projectDetailsString);
+  }
 
   const openTodoModal = (task: TaskData) => {
     setSelectedTask(task);
@@ -70,70 +99,142 @@ const TaskList: React.FC<TaskListProps> = ({
                 To Do:
               </h2>
               {taskData.map((task, index) => (
-                <Draggable key={task.id} draggableId={task.id} index={index}>
-                  {(provided) => (
+                <div key={index}>
+                  <Draggable
+                    key={task.id}
+                    draggableId={`${task.id}-todo`}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        onClick={() => openTodoModal(task)}
+                      >
+                        <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
+                          <p className="font-semibold">
+                            Task Name: {task.taskName}
+                          </p>
+                          <p>Description: {task.description}</p>
+                          {/* <p>Priority: {task.priority}</p> */}
+                          <p>Duration: {task.duration} days</p>
+                          <div className="absolute bottom-1 right-2">
+                            {
+                              priorityIconMap[
+                                task.priority as keyof PriorityIconMap
+                              ]
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                  <SubTaskModal
+                    key={`${task.id}-todo-modal`}
+                    isOpen={isTodoModalOpen}
+                    onClose={closeModal}
+                  >
                     <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      onClick={() => openTodoModal(task)}
+                      className={`fixed z-10 inset-0 overflow-y-auto ${
+                        isTodoModalOpen ? "block" : "hidden"
+                      }`}
                     >
-                      <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
-                        <p className="font-semibold">
-                          Task Name: {task.taskName}
-                        </p>
-                        <p>Description: {task.description}</p>
-                        {/* <p>Priority: {task.priority}</p> */}
-                        <p>Duration: {task.duration} days</p>
-                        <div className="absolute bottom-1 right-2">
-                          {
-                            priorityIconMap[
-                              task.priority as keyof PriorityIconMap
-                            ]
-                          }
+                      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div
+                          className="fixed inset-0 transition-opacity"
+                          aria-hidden="true"
+                        >
+                          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                        </div>
+
+                        <span
+                          className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                          aria-hidden="true"
+                        >
+                          &#8203;
+                        </span>
+
+                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            {/* Left side */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <h1 className="text-xl font-bold text-gray-800">
+                                  {selectedTask?.taskName}
+                                </h1>
+                                <p className="text-lg text-gray-800">
+                                  {selectedTask?.description}
+                                </p>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  activity
+                                </p>
+
+                                {/* Comment section */}
+                                <div className="mt-4">
+                                  <h3 className="text-lg font-bold text-gray-800">
+                                    Comments
+                                  </h3>
+                                  {/* Render comments here */}
+                                  {comments.map((comment, index) => (
+                                    <p key={index} className="text-gray-700">
+                                      {comment}
+                                    </p>
+                                  ))}
+                                  {/* Add an input box for new comments */}
+                                  <input
+                                    type="text"
+                                    className="mt-2 border border-gray-300 p-2 w-full"
+                                    placeholder="Add a comment..."
+                                    value={newComment}
+                                    onChange={(e) =>
+                                      setNewComment(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddComment();
+                                      }
+                                    }}
+                                  />
+                                  <button onClick={handleAddComment}>
+                                    Add Comment
+                                  </button>
+                                </div>
+                              </div>
+                              {/* Right side */}
+                              <div>
+                                <h2 className="text-lg font-bold text-gray-800">
+                                  Details
+                                </h2>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  Reporter: {projectDetails?.projectOwner}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Assignee: {selectedTask?.assignee}
+                                </p>
+                                {/* Add other details here */}
+                                {/* Example: */}
+                                {/* <p>Priority: {selectedTask?.priority}</p> */}
+                                {/* <p>Parent: {selectedTask?.parent}</p> */}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button
+                              type="button"
+                              onClick={closeModal}
+                              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                            >
+                              Close
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </Draggable>
-              ))}
-              <SubTaskModal isOpen={isTodoModalOpen} onClose={closeModal}>
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                  <div className="bg-white rounded-lg w-1/2 p-8">
-                    <div className="flex justify-between items-center border-b-2 pb-4">
-                      <h2 className="text-lg font-semibold">Task Details</h2>
-                      <button
-                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                        onClick={closeModal}
-                      >
-                        &times;
-                      </button>
-                    </div>
-                    <div className="mt-4">
-                      <p className="mb-2">
-                        <span className="font-semibold">Task Name:</span>{" "}
-                        {selectedTask?.taskName}
-                      </p>
-                      <p className="mb-2">
-                        <span className="font-semibold">Description:</span>{" "}
-                        {selectedTask?.description}
-                      </p>
-                      <p className="mb-2">
-                        <span className="font-semibold">Assignee:</span>{" "}
-                        {selectedTask?.assignee}
-                      </p>
-                      <p className="mb-2">
-                        <span className="font-semibold">Duration:</span>{" "}
-                        {selectedTask?.duration}
-                      </p>
-                      <p className="mb-2">
-                        <span className="font-semibold">Status:</span>{" "}
-                        {selectedTask?.status}
-                      </p>
-                    </div>
-                  </div>
+                  </SubTaskModal>
                 </div>
-              </SubTaskModal>
+              ))}
 
               {provided.placeholder}
             </div>
@@ -160,91 +261,142 @@ const TaskList: React.FC<TaskListProps> = ({
                 In Progress:
               </h2>
               {progressData?.map((task, index) => (
-                <Draggable key={task.id} draggableId={task.id} index={index}>
-                  {(provided) => (
+                <div key={index}>
+                  <Draggable
+                    key={task.id}
+                    draggableId={`${task.id}-inProgress`}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        onClick={() => openInProgressModal(task)}
+                      >
+                        <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
+                          <p className="font-semibold">
+                            Task Name: {task.taskName}
+                          </p>
+                          <p>Description: {task.description}</p>
+                          <p>Duration: {task.duration} days</p>
+                          <div className="absolute bottom-1 right-2">
+                            {
+                              priorityIconMap[
+                                task.priority as keyof PriorityIconMap
+                              ]
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                  <SubTaskModal
+                    key={`${task.id}-inProgress-modal`}
+                    isOpen={isInProgressModalOpen}
+                    onClose={closeModal}
+                  >
                     <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      onClick={() => openInProgressModal(task)}
+                      className={`fixed z-10 inset-0 overflow-y-auto ${
+                        isInProgressModalOpen ? "block" : "hidden"
+                      }`}
                     >
-                      <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
-                        <p className="font-semibold">
-                          Task Name: {task.taskName}
-                        </p>
-                        <p>Description: {task.description}</p>
-                        <p>Duration: {task.duration} days</p>
-                        <div className="absolute bottom-1 right-2">
-                          {
-                            priorityIconMap[
-                              task.priority as keyof PriorityIconMap
-                            ]
-                          }
+                      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div
+                          className="fixed inset-0 transition-opacity"
+                          aria-hidden="true"
+                        >
+                          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                        </div>
+
+                        <span
+                          className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                          aria-hidden="true"
+                        >
+                          &#8203;
+                        </span>
+
+                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            {/* Left side */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <h1 className="text-xl font-bold text-gray-800">
+                                  {selectedTask?.taskName}
+                                </h1>
+                                <p className="text-lg text-gray-800">
+                                  {selectedTask?.description}
+                                </p>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  activity
+                                </p>
+
+                                {/* Comment section */}
+                                <div className="mt-4">
+                                  <h3 className="text-lg font-bold text-gray-800">
+                                    Comments
+                                  </h3>
+                                  {/* Render comments here */}
+                                  {comments.map((comment, index) => (
+                                    <p key={index} className="text-gray-700">
+                                      {comment}
+                                    </p>
+                                  ))}
+                                  {/* Add an input box for new comments */}
+                                  <input
+                                    type="text"
+                                    className="mt-2 border border-gray-300 p-2 w-full"
+                                    placeholder="Add a comment..."
+                                    value={newComment}
+                                    onChange={(e) =>
+                                      setNewComment(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddComment();
+                                      }
+                                    }}
+                                  />
+                                  <button onClick={handleAddComment}>
+                                    Add Comment
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Right side */}
+                              <div>
+                                <h2 className="text-lg font-bold text-gray-800">
+                                  Details
+                                </h2>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  Reporter: {projectDetails?.projectOwner}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Assignee: {selectedTask?.assignee}
+                                </p>
+                                {/* Add other details here */}
+                                {/* Example: */}
+                                {/* <p>Priority: {selectedTask?.priority}</p> */}
+                                {/* <p>Parent: {selectedTask?.parent}</p> */}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button
+                              type="button"
+                              onClick={closeModal}
+                              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                            >
+                              Close
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </Draggable>
-              ))}
-              <SubTaskModal isOpen={isInProgressModalOpen} onClose={closeModal}>
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                  <div className="bg-white rounded-lg p-8 w-3/4">
-                    <div className="flex justify-between items-center border-b-2 pb-4">
-                      <h2 className="text-2xl font-bold text-blue-900">
-                        Task Details
-                      </h2>
-                      <button
-                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                        onClick={closeModal}
-                      >
-                        <svg
-                          className="w-6 h-6 fill-current"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M18.707 5.293a1 1 0 011.414 1.414L13.414 12l6.707 6.707a1 1 0 01-1.414 1.414L12 13.414l-6.707 6.707a1 1 0 01-1.414-1.414L10.586 12 3.879 5.293a1 1 0 111.414-1.414L12 10.586l6.707-6.707z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="mt-4">
-                      <p className="text-lg mb-2 text-gray-800">
-                        <span className="font-semibold text-blue-900">
-                          Task Name:
-                        </span>{" "}
-                        {selectedTask?.taskName}
-                      </p>
-                      <p className="text-lg mb-2 text-gray-800">
-                        <span className="font-semibold text-blue-900">
-                          Description:
-                        </span>{" "}
-                        {selectedTask?.description}
-                      </p>
-                      <p className="text-lg mb-2 text-gray-800">
-                        <span className="font-semibold text-blue-900">
-                          Assignee:
-                        </span>{" "}
-                        {selectedTask?.assignee}
-                      </p>
-                      <p className="text-lg mb-2 text-gray-800">
-                        <span className="font-semibold text-blue-900">
-                          Duration:
-                        </span>{" "}
-                        {selectedTask?.duration}
-                      </p>
-                      <p className="text-lg mb-2 text-gray-800">
-                        <span className="font-semibold text-blue-900">
-                          Status:
-                        </span>{" "}
-                        {selectedTask?.status}
-                      </p>
-                    </div>
-                  </div>
+                  </SubTaskModal>
                 </div>
-              </SubTaskModal>
+              ))}
 
               {provided.placeholder}
             </div>
@@ -271,118 +423,142 @@ const TaskList: React.FC<TaskListProps> = ({
                 Done:
               </h2>
               {completedData?.map((task, index) => (
-                <Draggable key={task.id} draggableId={task.id} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      onClick={() => openDoneModal(task)}
-                    >
-                      <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
-                        <p className="font-semibold">
-                          Task Name: {task.taskName}
-                        </p>
-                        <p>Description: {task.description}</p>
-                        <p>Duration: {task.duration} days</p>
-                        <div className="absolute bottom-1 right-2">
-                          {
-                            priorityIconMap[
-                              task.priority as keyof PriorityIconMap
-                            ]
-                          }
+                <div key={index}>
+                  <Draggable
+                    key={task.id}
+                    draggableId={`${task.id}-done`}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        onClick={() => openDoneModal(task)}
+                      >
+                        <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
+                          <p className="font-semibold">
+                            Task Name: {task.taskName}
+                          </p>
+                          <p>Description: {task.description}</p>
+                          <p>Duration: {task.duration} days</p>
+                          <div className="absolute bottom-1 right-2">
+                            {
+                              priorityIconMap[
+                                task.priority as keyof PriorityIconMap
+                              ]
+                            }
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              <SubTaskModal isOpen={isDoneModalOpen} onClose={closeModal}>
-                <div
-                  className={`fixed z-10 inset-0 overflow-y-auto ${
-                    isDoneModalOpen ? "block" : "hidden"
-                  }`}
-                >
-                  <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    )}
+                  </Draggable>
+                  <SubTaskModal
+                    key={`${task.id}-done-modal`}
+                    isOpen={isDoneModalOpen}
+                    onClose={closeModal}
+                  >
                     <div
-                      className="fixed inset-0 transition-opacity"
-                      aria-hidden="true"
+                      className={`fixed z-10 inset-0 overflow-y-auto ${
+                        isDoneModalOpen ? "block" : "hidden"
+                      }`}
                     >
-                      <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                    </div>
+                      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div
+                          className="fixed inset-0 transition-opacity"
+                          aria-hidden="true"
+                        >
+                          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                        </div>
 
-                    <span
-                      className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                      aria-hidden="true"
-                    >
-                      &#8203;
-                    </span>
+                        <span
+                          className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                          aria-hidden="true"
+                        >
+                          &#8203;
+                        </span>
 
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                      <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        {/* Left side */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <h1 className="text-xl font-bold text-gray-800">
-                              {selectedTask?.taskName}
-                            </h1>
-                            <p className="text-lg text-gray-800">
-                              {selectedTask?.description}
-                            </p>
-                            <p className="text-sm text-gray-600 mt-2">
-                              activity
-                            </p>
+                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            {/* Left side */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <h1 className="text-xl font-bold text-gray-800">
+                                  {selectedTask?.taskName}
+                                </h1>
+                                <p className="text-lg text-gray-800">
+                                  {selectedTask?.description}
+                                </p>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  activity
+                                </p>
 
-                            {/* Comment section */}
-                            <div className="mt-4">
-                              <h3 className="text-lg font-bold text-gray-800">
-                                Comments
-                              </h3>
-                              {/* Render comments here */}
-                              {/* Example: */}
-                              {/* <p>Comment 1</p> */}
-                              {/* <p>Comment 2</p> */}
-                              {/* Add an input box for new comments */}
-                              <input
-                                type="text"
-                                className="mt-2 border border-gray-300 p-2 w-full"
-                                placeholder="Add a comment..."
-                              />
+                                {/* Comment section */}
+                                <div className="mt-4">
+                                  <h3 className="text-lg font-bold text-gray-800">
+                                    Comments
+                                  </h3>
+                                  {/* Render comments here */}
+                                  {comments.map((comment, index) => (
+                                    <p key={index} className="text-gray-700">
+                                      {comment}
+                                    </p>
+                                  ))}
+                                  {/* Add an input box for new comments */}
+                                  <input
+                                    type="text"
+                                    className="mt-2 border border-gray-300 p-2 w-full"
+                                    placeholder="Add a comment..."
+                                    value={newComment}
+                                    onChange={(e) =>
+                                      setNewComment(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddComment();
+                                      }
+                                    }}
+                                  />
+                                  <button onClick={handleAddComment}>
+                                    Add Comment
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Right side */}
+                              <div>
+                                <h2 className="text-lg font-bold text-gray-800">
+                                  Details
+                                </h2>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  Reporter: {projectDetails?.projectOwner}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Assignee: {selectedTask?.assignee}
+                                </p>
+                                {/* Add other details here */}
+                                {/* Example: */}
+                                {/* <p>Priority: {selectedTask?.priority}</p> */}
+                                {/* <p>Parent: {selectedTask?.parent}</p> */}
+                              </div>
                             </div>
                           </div>
 
-                          {/* Right side */}
-                          <div>
-                            <h2 className="text-lg font-bold text-gray-800">
-                              Details
-                            </h2>
-                            <p className="text-sm text-gray-600 mt-2">
-                              Reporter: {projectDetails?.projectOwner}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Assignee: {selectedTask?.assignee}
-                            </p>
-                            {/* Add other details here */}
-                            {/* Example: */}
-                            {/* <p>Priority: {selectedTask?.priority}</p> */}
-                            {/* <p>Parent: {selectedTask?.parent}</p> */}
+                          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button
+                              type="button"
+                              onClick={closeModal}
+                              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                            >
+                              Close
+                            </button>
                           </div>
                         </div>
                       </div>
-
-                      <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                          type="button"
-                          onClick={closeModal}
-                          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                          Close
-                        </button>
-                      </div>
                     </div>
-                  </div>
+                  </SubTaskModal>
                 </div>
-              </SubTaskModal>
+              ))}
 
               {provided.placeholder}
             </div>

@@ -178,7 +178,6 @@ const ProjectPage: React.FC = () => {
   };
 
   const handleDragEnd = (result: DropResult) => {
-    console.log("drang and drop happened");
     const { source, destination } = result;
     if (!destination) return;
     if (
@@ -204,14 +203,14 @@ const ProjectPage: React.FC = () => {
 
     // Add the task to the destination droppable area
     if (destination.droppableId === "todo") {
-      updatedTaskData.splice(destination.index, 0, draggedTask);
       draggedTask.status = "todo";
+      updatedTaskData.splice(destination.index, 0, draggedTask);
     } else if (destination.droppableId === "inProgress") {
-      updatedProgressData.splice(destination.index, 0, draggedTask);
       draggedTask.status = "inProgress";
+      updatedProgressData.splice(destination.index, 0, draggedTask);
     } else {
-      updatedCompletedData.splice(destination.index, 0, draggedTask);
       draggedTask.status = "done";
+      updatedCompletedData.splice(destination.index, 0, draggedTask);
     }
 
     const projectDetailsString = localStorage.getItem("projectDetails");
@@ -220,20 +219,17 @@ const ProjectPage: React.FC = () => {
       const taskToUpdate = projectDetails.taskData.find(
         (task) => task.id === draggedTask.id
       );
-      console.log(taskToUpdate);
 
       if (taskToUpdate) {
         taskToUpdate.status = draggedTask.status;
         localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
-        console.log(taskToUpdate);
       }
     }
 
+    // Update the state for all lists
     setTaskData(updatedTaskData);
     setProgressData(updatedProgressData);
     setCompletedData(updatedCompletedData);
-
-    console.log("Updated Task:", draggedTask);
   };
 
   return (
