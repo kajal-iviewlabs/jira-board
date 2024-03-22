@@ -156,7 +156,10 @@ const TaskList: React.FC<TaskListProps> = ({
                         </span>
 
                         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                          <div
+                            className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
+                            style={{ maxHeight: "100vh" }}
+                          >
                             {/* Left side */}
                             <div className="grid grid-cols-2 gap-4">
                               <div>
@@ -176,29 +179,55 @@ const TaskList: React.FC<TaskListProps> = ({
                                     Comments
                                   </h3>
                                   {/* Render comments here */}
-                                  {comments.map((comment, index) => (
-                                    <p key={index} className="text-gray-700">
-                                      {comment}
-                                    </p>
-                                  ))}
-                                  {/* Add an input box for new comments */}
-                                  <input
-                                    type="text"
-                                    className="mt-2 border border-gray-300 p-2 w-full"
-                                    placeholder="Add a comment..."
-                                    value={newComment}
-                                    onChange={(e) =>
-                                      setNewComment(e.target.value)
-                                    }
-                                    onKeyPress={(e) => {
-                                      if (e.key === "Enter") {
-                                        handleAddComment();
-                                      }
+                                  <div
+                                    className="mt-2"
+                                    style={{
+                                      maxHeight: "calc(80vh - 250px)",
+                                      overflowY: "auto",
                                     }}
-                                  />
-                                  <button onClick={handleAddComment}>
-                                    Add Comment
-                                  </button>
+                                  >
+                                    {comments.map((comment, index) => (
+                                      <div
+                                        key={index}
+                                        className="bg-gray-100 rounded-md p-3 mb-2 flex items-center justify-between"
+                                      >
+                                        <p className="text-gray-700">
+                                          {comment}
+                                        </p>
+                                        <button
+                                          className="text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
+                                          onClick={() =>
+                                            handleDeleteComment(index)
+                                          }
+                                        >
+                                          Delete
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  {/* Add an input box for new comments */}
+                                  <div className="mt-4">
+                                    <input
+                                      type="text"
+                                      className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+                                      placeholder="Add a comment..."
+                                      value={newComment}
+                                      onChange={(e) =>
+                                        setNewComment(e.target.value)
+                                      }
+                                      onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                          handleAddComment();
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      onClick={handleAddComment}
+                                      className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                                    >
+                                      Add Comment
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                               {/* Right side */}
