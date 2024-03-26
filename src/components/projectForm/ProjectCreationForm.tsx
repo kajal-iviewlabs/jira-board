@@ -72,7 +72,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-full py-10">
+    <div className="flex justify-center items-center h-full">
       <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md">
         <h1 className="text-2xl text-blue-900 font-semibold mb-4 text-center">
           Create a New Project

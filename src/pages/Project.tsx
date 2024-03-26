@@ -10,6 +10,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import TaskList from "../components/Task/TaskList";
 import { ProjectDetails } from "../components/projectForm/ProjectCreationForm";
 
+declare global {
+  interface Window {
+    Email: any; // Adjust the type as per your Email object structure
+  }
+}
+
 export interface TaskData {
   id: string;
   taskName: string;
@@ -98,7 +104,7 @@ const ProjectPage: React.FC = () => {
     }
   }, [projectDetails]);
 
-  const handleInvite = (email: string) => {
+  const handleInvite = async (email: string) => {
     setInvitedEmails((prevInvitedEmails) => [...prevInvitedEmails, email]);
 
     if (projectDetails && projectKey) {
@@ -115,6 +121,19 @@ const ProjectPage: React.FC = () => {
         .catch((error) => {
           console.error("Error updating project details:", error);
         });
+    }
+    const config = {
+      SecureToken: "0d8b3af2-5d19-44c2-b1af-ae4977760df5",
+      To: email,
+      From: user?.email,
+      Subject: "This is the subject",
+      Body: "And this is the body",
+    };
+
+    if (window.Email) {
+      window.Email.send(config).then(() => {
+        alert("email sent successfully");
+      });
     }
   };
 
