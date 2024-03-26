@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch } from "react-redux";
 import { createProject } from "../../store/actions";
+import { TaskData } from "../../pages/Project";
 
 export type ProjectDetails = {
   projectName: string;
@@ -12,7 +13,9 @@ export type ProjectDetails = {
   projectOwner: string;
   projectStatus: string;
   invitedEmails: string[];
-  taskData: any[];
+  taskData: TaskData[];
+  inProgressData?: TaskData[];
+  doneData?: TaskData[];
 };
 
 const ProjectCreationForm: React.FC<{}> = () => {
@@ -37,6 +40,8 @@ const ProjectCreationForm: React.FC<{}> = () => {
       projectStatus,
       invitedEmails: [projectOwner],
       taskData: [],
+      inProgressData: [],
+      doneData: [],
     };
 
     try {

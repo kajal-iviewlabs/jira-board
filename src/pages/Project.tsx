@@ -5,9 +5,10 @@ import TaskModal from "../components/Task/TaskModal";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { FaExclamationCircle, FaRegCircle, FaCircle } from "react-icons/fa";
 import { database } from "../firebaseConfig";
-import { ref, update } from "firebase/database";
+import { ref, update, onValue } from "firebase/database";
 import { useAuth0 } from "@auth0/auth0-react";
 import TaskList from "../components/Task/TaskList";
+import { ProjectDetails } from "../components/projectForm/ProjectCreationForm";
 
 export interface TaskData {
   id: string;
@@ -17,17 +18,6 @@ export interface TaskData {
   assignee: string;
   duration: string;
   status: string;
-}
-
-interface ProjectDetails {
-  projectName: string;
-  projectDescription: string;
-  projectStartDate: string;
-  projectEndDate: string;
-  projectOwner: string;
-  projectStatus: string;
-  invitedEmails: string[];
-  taskData: TaskData[];
 }
 
 export interface PriorityIconMap {
@@ -81,41 +71,32 @@ const ProjectPage: React.FC = () => {
     if (projectName) {
       fetchData();
     }
-  }, [projectName]);
+  }, [projectName, user?.name]);
 
   useEffect(() => {
-    // Save projectKey and other necessary data to localStorage
-    if (projectKey && projectDetails) {
-      localStorage.setItem("projectKey", projectKey);
+    if (projectKey) {
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+      const unsubscribe = onValue(projectRef, (snapshot) => {
+        const projectData = snapshot.val();
+        if (projectData) {
+          setProjectDetails(projectData);
+          setTaskData(projectData.taskData || []);
+          setProgressData(projectData.inProgressData || []);
+          setCompletedData(projectData.doneData || []);
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [projectKey, user?.name]);
+
+  useEffect(() => {
+    if (projectDetails) {
       localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
     }
-  }, [projectKey, projectDetails]);
-
-  useEffect(() => {
-    const storedProjectKey = localStorage.getItem("projectKey");
-    const storedProjectDetails = localStorage.getItem("projectDetails");
-    if (storedProjectKey && storedProjectDetails) {
-      const parsedProjectDetails: ProjectDetails =
-        JSON.parse(storedProjectDetails);
-      setProjectKey(storedProjectKey);
-      setProjectDetails(parsedProjectDetails);
-      if (parsedProjectDetails.taskData) {
-        const todoTasks = parsedProjectDetails.taskData.filter(
-          (task) => task.status === "todo"
-        );
-        const inProgressTasks = parsedProjectDetails.taskData.filter(
-          (task) => task.status === "inProgress"
-        );
-        const doneTasks = parsedProjectDetails.taskData.filter(
-          (task) => task.status === "done"
-        );
-
-        setTaskData(todoTasks);
-        setProgressData(inProgressTasks);
-        setCompletedData(doneTasks);
-      }
-    }
-  }, []);
+  }, [projectDetails]);
 
   const handleInvite = (email: string) => {
     setInvitedEmails((prevInvitedEmails) => [...prevInvitedEmails, email]);
@@ -146,13 +127,16 @@ const ProjectPage: React.FC = () => {
   };
 
   const handleTaskSubmission = (newTaskData: TaskData) => {
+    console.log("Project Key:", projectKey);
+    console.log("Project Details:", projectDetails);
+
     const updatedTaskData = [...taskData, newTaskData];
     setTaskData(updatedTaskData);
 
     if (projectKey && projectDetails) {
       const updatedProjectDetails = {
         ...projectDetails,
-        taskData: updatedTaskData,
+        taskData: [...updatedTaskData],
       };
       setProjectDetails(updatedProjectDetails);
       const projectRef = ref(database, `${user?.name}/${projectKey}`);
@@ -177,7 +161,7 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
     if (!destination) return;
     if (
@@ -213,23 +197,25 @@ const ProjectPage: React.FC = () => {
       updatedCompletedData.splice(destination.index, 0, draggedTask);
     }
 
-    const projectDetailsString = localStorage.getItem("projectDetails");
-    if (projectDetailsString) {
-      const projectDetails: ProjectDetails = JSON.parse(projectDetailsString);
-      const taskToUpdate = projectDetails.taskData.find(
-        (task) => task.id === draggedTask.id
-      );
-
-      if (taskToUpdate) {
-        taskToUpdate.status = draggedTask.status;
-        localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
-      }
-    }
-
     // Update the state for all lists
     setTaskData(updatedTaskData);
     setProgressData(updatedProgressData);
     setCompletedData(updatedCompletedData);
+
+    // Update Firebase data
+    try {
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+      const updatedProjectDetails = {
+        ...projectDetails!,
+        taskData: [...updatedTaskData],
+        inProgressData: [...updatedProgressData],
+        doneData: [...updatedCompletedData],
+      };
+      await update(projectRef, updatedProjectDetails);
+      console.log("Firebase data updated successfully.");
+    } catch (error) {
+      console.error("Error updating Firebase data:", error);
+    }
   };
 
   return (

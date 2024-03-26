@@ -5,6 +5,7 @@ export default {
     extend: {
       blue: {
         900: "#172b4d",
+        "172b4d": "#172b4d",
       },
     },
   },

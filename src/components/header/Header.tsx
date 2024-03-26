@@ -5,6 +5,7 @@ import Project from "../projectForm/Project";
 import { Link } from "react-router-dom";
 import HomeIcon from "../../assets/HomeIcon";
 import ArrowIcon from "../../assets/ArrowIcon";
+import ManageAccount from "../../assets/ManageAccount";
 
 const Header = () => {
   const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
@@ -115,19 +116,45 @@ const Header = () => {
                         <div className="dropdown-content">
                           <div className="dropdown-name">Account</div>
                           <div className="dropdown-user-details">
-                            <button
-                              className="login-btn"
-                              onClick={toggleDropdown}
+                            <div className="flex">
+                              <button
+                                className="login-btn"
+                                onClick={toggleDropdown}
+                              >
+                                {user && user.name ? (
+                                  <div className="login-initial">
+                                    {getFirstLetter(user.name)}
+                                  </div>
+                                ) : (
+                                  "Log In"
+                                )}
+                              </button>
+                              <p className="ml-3">{user?.name}</p>
+                            </div>
+                            <Link
+                              to={{
+                                pathname: "account",
+                                search: `?userImage=${
+                                  user && user.name
+                                    ? encodeURIComponent(
+                                        getFirstLetter(user.name)
+                                      )
+                                    : ""
+                                }`,
+                              }}
+                              className="flex justify-between w-full mt-3 space-x-12 h-7 hover:bg-gray-100 hover:text-gray-800"
                             >
-                              {user && user.name ? (
-                                <div className="login-initial">
-                                  {getFirstLetter(user.name)}
-                                </div>
-                              ) : (
-                                "Log In"
-                              )}
-                            </button>
-                            <p>{user?.name}</p>
+                              <span className="flex flex-grow">
+                                <span className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+                                  Manage account
+                                </span>
+                              </span>
+                              <span className="flex">
+                                <span className="inline-block flex-shrink-0 leading-none w-16 h-16">
+                                  <ManageAccount />
+                                </span>
+                              </span>
+                            </Link>
                           </div>
 
                           {/* logout btn */}
