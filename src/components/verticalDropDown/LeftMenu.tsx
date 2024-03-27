@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import "./LeftMenu.css";
 
 const LeftMenu = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user } = useAuth0();
+  const navigate = useNavigate();
+  const userEmail = user?.email || "";
+  const userProjects = JSON.parse(localStorage.getItem(userEmail) || "[]");
+
+  console.log(userProjects);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -13,29 +21,22 @@ const LeftMenu = () => {
     setIsHovered(false);
   };
 
-  const handleDropdownMouseEnter = () => {
-    setIsDropdownOpen(true);
-  };
-
-  const handleDropdownMouseLeave = () => {
-    setIsDropdownOpen(false);
-  };
-
   const handleButtonClick = () => {
     setIsHovered(true);
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const handleProjectClick = (projectName: string) => {
+    navigate(`/project/${projectName}`);
+  };
+
   return (
-    <>
-      <div
-        className="hover-div"
-        onMouseEnter={handleDropdownMouseEnter}
-        onMouseLeave={handleDropdownMouseLeave}
-      ></div>
-      <div className="line"></div>
+    <div className="relative">
+      <div className={`${isDropdownOpen ? "line-open" : "line"}`}></div>
       <button
-        className={`expand-btn ${isHovered ? "hovered" : ""}`}
+        className={`bg-blue-900 text-gray-100 ${
+          isDropdownOpen ? "expand-btn-open" : "expand-btn"
+        }`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleButtonClick}
@@ -60,10 +61,50 @@ const LeftMenu = () => {
       </button>
       {isDropdownOpen && (
         <>
-          <div className="dropdown1"></div>
+          <div className="dropdown1 ">
+            <div className="relative flex items-center w-full min-h-40px p-2 border-none text-base outline-none text-current cursor-pointer rounded-md bg-transparent">
+              <span className="flex items-center justify-between w-full flex-1 gap-12px">
+                <span className="flex items-center justify-center flex-shrink-0">
+                  <div className="inline-block relative outline-none">
+                    <span className="h-6 w-6 items-center bg-transparent rounded-md cursor-pointer flex flex-col justify-center outline-none transition duration-200 ease-in-out shadow-none border-none m-2 p-0">
+                      <img
+                        src="https://iview-internal.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10414?size=xxlarge"
+                        alt=""
+                        className="border rounded-md"
+                      />
+                    </span>
+                  </div>
+                </span>
+                <span className="flex justify-center flex-col flex-grow line-height-[16px] outline-none overflow-hidden text-left">
+                  <h2 className="text-base font-semibold tracking-tight text-blue-900">
+                    {user?.name}
+                  </h2>
+                  <span className="mt-1 text-gray-400 text-xs block overflow-hidden truncate whitespace-nowrap">
+                    Software project
+                  </span>
+                </span>
+              </span>
+            </div>
+
+            {/* user's work */}
+
+            <ul className="list-none">
+              {userProjects.map((project: any, index: number) => (
+                <div
+                  key={index}
+                  onClick={() => handleProjectClick(project.projectName)}
+                  className="p-2 cursor-pointer hover:bg-blue-100"
+                >
+                  <li className="p-2 cursor-pointer hover:text-blue-900">
+                    {project.projectName}
+                  </li>
+                </div>
+              ))}
+            </ul>
+          </div>
         </>
       )}
-    </>
+    </div>
   );
 };
 

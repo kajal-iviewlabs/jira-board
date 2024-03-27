@@ -4,7 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch } from "react-redux";
 import { createProject } from "../../store/actions";
 import { TaskData } from "../../pages/Project";
-// import "./ProjectCreationForm.css";
+import { ToastContainer, toast } from "react-toastify";
 
 export type ProjectDetails = {
   projectName: string;
@@ -26,6 +26,8 @@ const ProjectCreationForm: React.FC<{}> = () => {
   const [projectStartDate, setProjectStartDate] = useState<string>("");
   const [projectEndDate, setProjectEndDate] = useState<string>("");
   const [projectStatus, setProjectStatus] = useState<string>("");
+  const [isPlaceholderSelected, setIsPlaceholderSelected] =
+    useState<boolean>(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -58,9 +60,27 @@ const ProjectCreationForm: React.FC<{}> = () => {
       );
 
       if (resp.ok) {
-        alert("Data stored successfully");
+        toast.success("New Project Created", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       } else {
-        alert("Error storing data");
+        toast.error("Error Storing Data.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
 
       dispatch(createProject(projectDetails));
@@ -70,6 +90,12 @@ const ProjectCreationForm: React.FC<{}> = () => {
       console.error("Error storing project details:", error);
       alert("An error occurred while storing project details");
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setProjectStatus(value);
+    setIsPlaceholderSelected(value !== ""); // Set isPlaceholderSelected to true if an option is selected
   };
 
   return (
@@ -119,8 +145,10 @@ const ProjectCreationForm: React.FC<{}> = () => {
         <label className="text-blue-900">Project Status</label>
         <select
           value={projectStatus}
-          onChange={(e) => setProjectStatus(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
+          onChange={handleChange}
+          className={`w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 ${
+            !isPlaceholderSelected ? "text-gray-400" : "text-blue-900"
+          }`}
         >
           <option value="">None</option>
           <option value="active">Active</option>
@@ -130,11 +158,12 @@ const ProjectCreationForm: React.FC<{}> = () => {
 
         <button
           onClick={handleCreateProject}
-          className="w-full px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none"
+          className="w-full px-6 py-2 bg-blue-900 text-gray-100 rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
         >
           Create Project
         </button>
       </div>
+      <ToastContainer />
     </div>
   );
 };

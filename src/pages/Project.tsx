@@ -60,6 +60,8 @@ const ProjectPage: React.FC = () => {
           throw new Error("Failed to fetch project details");
         }
         const data = await response.json();
+
+        const userProjects = [];
         for (const key in data) {
           if (Object.prototype.hasOwnProperty.call(data, key)) {
             const nestedObject = data[key];
@@ -67,10 +69,19 @@ const ProjectPage: React.FC = () => {
               setProjectDetails(nestedObject);
               setProjectKey(key);
               setTaskData(nestedObject.taskData || []);
-              break;
+              // break;
+            }
+
+            if (
+              nestedObject.invitedEmails.some(
+                (email: any) => email === user?.email
+              )
+            ) {
+              userProjects.push(nestedObject);
             }
           }
         }
+        localStorage.setItem(user?.email || "", JSON.stringify(userProjects));
       } catch (error) {
         console.error("Error fetching project details:", error);
       }
@@ -78,7 +89,7 @@ const ProjectPage: React.FC = () => {
     if (projectName) {
       fetchData();
     }
-  }, [projectName, user?.name]);
+  }, [projectName, user?.name, invitedEmails]);
 
   useEffect(() => {
     if (projectKey) {
@@ -273,7 +284,7 @@ const ProjectPage: React.FC = () => {
             </h1>
             <button
               onClick={handleOpenTaskModal}
-              className="bg-blue-900 text-gray-100 hover:bg-gray-100 hover:text-blue-900 font-bold py-2 px-4 rounded"
+              className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
             >
               Create Task
             </button>

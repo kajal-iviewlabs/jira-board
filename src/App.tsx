@@ -25,11 +25,13 @@ function App() {
 
   return (
     <>
-      <div>
-        <Header />
-        <div className="content">
-          <LeftMenu />
-          <Layout />
+      <div className="flex h-screen">
+        <LeftMenu />
+        <div className="flex-1 overflow-auto">
+          <Header />
+          <div className="content">
+            <Layout />
+          </div>
         </div>
       </div>
     </>

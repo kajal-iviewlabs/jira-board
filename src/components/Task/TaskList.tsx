@@ -211,7 +211,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                   <div className="mt-4">
                                     <input
                                       type="text"
-                                      className="border border-gray-100 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+                                      className="border border-gray-100 hover:border-blue-900 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
                                       placeholder="Add a comment..."
                                       value={newComment}
                                       onChange={(e) =>
@@ -225,7 +225,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                     />
                                     <button
                                       onClick={handleAddComment}
-                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 border hover:border-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
                                     >
                                       Add Comment
                                     </button>
@@ -257,7 +257,7 @@ const TaskList: React.FC<TaskListProps> = ({
                             <button
                               type="button"
                               onClick={closeModal}
-                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 border border-gray-100 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 border border-gray-100 hover:border-blue-900 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                             >
                               Close
                             </button>
@@ -403,7 +403,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                   <div className="mt-4">
                                     <input
                                       type="text"
-                                      className="border border-gray-100 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+                                      className="border border-gray-100 hover:border-blue-900 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
                                       placeholder="Add a comment..."
                                       value={newComment}
                                       onChange={(e) =>
@@ -417,7 +417,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                     />
                                     <button
                                       onClick={handleAddComment}
-                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 border hover:border-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
                                     >
                                       Add Comment
                                     </button>
@@ -449,7 +449,7 @@ const TaskList: React.FC<TaskListProps> = ({
                             <button
                               type="button"
                               onClick={closeModal}
-                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 border border-gray-100 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 hover:border-blue-900 border border-gray-100 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                             >
                               Close
                             </button>
@@ -595,7 +595,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                   <div className="mt-4">
                                     <input
                                       type="text"
-                                      className="border border-gray-100 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+                                      className="border border-gray-100 hover:border-blue-900 rounded-md p-2 w-full focus:outline-none focus:ring focus:border-blue-500"
                                       placeholder="Add a comment..."
                                       value={newComment}
                                       onChange={(e) =>
@@ -609,7 +609,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                     />
                                     <button
                                       onClick={handleAddComment}
-                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 border hover:border-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
                                     >
                                       Add Comment
                                     </button>
@@ -641,7 +641,7 @@ const TaskList: React.FC<TaskListProps> = ({
                             <button
                               type="button"
                               onClick={closeModal}
-                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 border border-gray-100 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 hover:border-blue-900 border border-gray-100 border-transparent hover:border-blue-900 shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                             >
                               Close
                             </button>

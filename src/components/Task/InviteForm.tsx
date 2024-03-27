@@ -65,8 +65,8 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
         value={email}
         onChange={handleChange}
         placeholder="Invite people"
-        className={`flex-grow px-4 py-2 mr-4 border rounded-md focus:outline-none ${
-          isValidEmail ? "border-gray-100" : "border-red-500"
+        className={`flex-grow px-4 py-2 mr-4 border border-gray-100 hover:border-blue-900 rounded-md focus:outline-none ${
+          isValidEmail ? "border-gray-100" : "border-red-600"
         }`}
         required
       />
@@ -77,7 +77,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
       )}
       <button
         onClick={handleInvite}
-        className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 focus:outline-none"
+        className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
       >
         Invite
       </button>
