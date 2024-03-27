@@ -9,10 +9,11 @@ import { ref, update, onValue } from "firebase/database";
 import { useAuth0 } from "@auth0/auth0-react";
 import TaskList from "../components/Task/TaskList";
 import { ProjectDetails } from "../components/projectForm/ProjectCreationForm";
+import emailjs from "@emailjs/browser";
 
 declare global {
   interface Window {
-    Email: any; // Adjust the type as per your Email object structure
+    Email: any;
   }
 }
 
@@ -122,19 +123,38 @@ const ProjectPage: React.FC = () => {
           console.error("Error updating project details:", error);
         });
     }
-    const config = {
-      SecureToken: "0d8b3af2-5d19-44c2-b1af-ae4977760df5",
-      To: email,
-      From: user?.email,
-      Subject: "This is the subject",
-      Body: "And this is the body",
-    };
+    // const config = {
+    //   Host: "smtp.elasticemail.com",
+    //   Username: "kajal.kapadiya@iviewlabs.net",
+    //   Password: "84A31FCAFEFDF25E210C83198E7EC4275570",
+    //   To: email,
+    //   From: user?.email,
+    //   Subject: "This is the subject",
+    //   Body: "And this is the body",
+    // };
 
-    if (window.Email) {
-      window.Email.send(config).then(() => {
-        alert("email sent successfully");
-      });
-    }
+    // if (window.Email) {
+    //   window.Email.send(config).then(() => {
+    //     alert("email sent successfully");
+    //   });
+    // }
+
+    emailjs
+      .send("service_44y5zre", "template_enq9pk3", {
+        to_name: email,
+        message_html: "This is the message body",
+        from_name: user?.email,
+        reply_to: user?.email,
+        publicKey: "s-Tg1LAk5W85f0jtP",
+      })
+      .then(
+        (response) => {
+          console.log("SUCCESS!", response.status, response.text);
+        },
+        (error) => {
+          console.log("FAILED...", error);
+        }
+      );
   };
 
   const handleOpenTaskModal = () => {
@@ -253,7 +273,7 @@ const ProjectPage: React.FC = () => {
             </h1>
             <button
               onClick={handleOpenTaskModal}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-blue-900 text-gray-100 hover:bg-gray-100 hover:text-blue-900 font-bold py-2 px-4 rounded"
             >
               Create Task
             </button>

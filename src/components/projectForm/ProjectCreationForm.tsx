@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch } from "react-redux";
 import { createProject } from "../../store/actions";
 import { TaskData } from "../../pages/Project";
+// import "./ProjectCreationForm.css";
 
 export type ProjectDetails = {
   projectName: string;
@@ -72,7 +73,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-full">
+    <div className="flex justify-center items-center my-20 h-full">
       <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md">
         <h1 className="text-2xl text-blue-900 font-semibold mb-4 text-center">
           Create a New Project
@@ -87,37 +88,41 @@ const ProjectCreationForm: React.FC<{}> = () => {
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
           placeholder="Project Name"
-          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
         />
         <label className="text-blue-900">Project Description</label>
         <textarea
           value={projectDescription}
           onChange={(e) => setProjectDescription(e.target.value)}
           placeholder="Project Description"
-          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
         />
         <label className="text-blue-900">Start Date</label>
         <input
-          type="date"
+          type="text"
+          placeholder="MM/DD/YYYY"
+          onFocus={(e) => (e.target.type = "date")}
           value={projectStartDate}
           onChange={(e) => setProjectStartDate(e.target.value)}
-          placeholder="Start Date"
+          id="custom-date-input"
           className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
         />
         <label className="text-blue-900">End Date</label>
         <input
-          type="date"
+          type="text"
+          placeholder="MM/DD/YYYY"
+          onFocus={(e) => (e.target.type = "date")}
           value={projectEndDate}
           onChange={(e) => setProjectEndDate(e.target.value)}
-          placeholder="End Date"
           className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
         />
         <label className="text-blue-900">Project Status</label>
         <select
           value={projectStatus}
           onChange={(e) => setProjectStatus(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+          className="w-full mb-4 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400"
         >
+          <option value="">None</option>
           <option value="active">Active</option>
           <option value="progress">In Progress</option>
           <option value="complete">Complete</option>

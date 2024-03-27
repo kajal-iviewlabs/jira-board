@@ -39,9 +39,9 @@ const ProjectListPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-full">
+    <div className="flex flex-col mt-20 items-center h-full">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-blue-900 text-center border-b border-gray-200 pb-2">
+        <h1 className="text-3xl font-bold mb-6 text-blue-900 text-center border-b border-blue-900 pb-2">
           All Projects
         </h1>
         <input
@@ -49,7 +49,7 @@ const ProjectListPage: React.FC = () => {
           value={searchTerm}
           onChange={handleSearchChange}
           placeholder="Search project..."
-          className="w-full mb-6 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+          className="w-full mb-6 px-4 py-2 border border-gray-100 rounded-md focus:outline-none focus:border-blue-500"
         />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects
