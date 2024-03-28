@@ -11,8 +11,6 @@ const LeftMenu = () => {
   const userEmail = user?.email || "";
   const userProjects = JSON.parse(localStorage.getItem(userEmail) || "[]");
 
-  console.log(userProjects);
-
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -77,7 +75,7 @@ const LeftMenu = () => {
                 </span>
                 <span className="flex justify-center flex-col flex-grow line-height-[16px] outline-none overflow-hidden text-left">
                   <h2 className="text-base font-semibold tracking-tight text-blue-900">
-                    {user?.name}
+                    {user?.name?.split(" ")[0]} - Tasks
                   </h2>
                   <span className="mt-1 text-gray-400 text-xs block overflow-hidden truncate whitespace-nowrap">
                     Software project

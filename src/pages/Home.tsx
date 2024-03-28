@@ -16,8 +16,8 @@ const Home = () => {
 
   if (token) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="w-1/2 flex flex-col items-start justify-center ml-5">
+      <div className="flex p-10 justify-center items-center h-screen">
+        <div className="w-1/2 flex flex-col items-start justify-center">
           <h1 className="text-4xl text-blue-900 font-bold mb-4 ">
             Welcome to Our Website
           </h1>
@@ -30,7 +30,7 @@ const Home = () => {
             journey to success. Let's create, collaborate, and achieve great
             things together!
           </p>
-          <button className="bg-blue-900 text-gray-100 hover:bg-gray-100 hover:text-blue-900 border hover:border-blue-900 p-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+          <button className="bg-blue-900 text-gray-100 hover:bg-gray-100 hover:text-blue-900 border hover:border-blue-900 p-3 rounded-lg shadow-md transition duration-300 ease-in-out hover:scale-105">
             <Link to="create">Create new project</Link>
           </button>
         </div>
