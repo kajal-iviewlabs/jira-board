@@ -11,8 +11,6 @@ const LeftMenu = () => {
   const userEmail = user?.email || "";
   const userProjects = JSON.parse(localStorage.getItem(userEmail) || "[]");
 
-  console.log(userProjects);
-
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -77,7 +75,7 @@ const LeftMenu = () => {
                 </span>
                 <span className="flex justify-center flex-col flex-grow line-height-[16px] outline-none overflow-hidden text-left">
                   <h2 className="text-base font-semibold tracking-tight text-blue-900">
-                    {user?.name}
+                    {user?.name?.split(" ")[0]} - Tasks
                   </h2>
                   <span className="mt-1 text-gray-400 text-xs block overflow-hidden truncate whitespace-nowrap">
                     Software project
@@ -88,19 +86,24 @@ const LeftMenu = () => {
 
             {/* user's work */}
 
-            <ul className="list-none">
+            <div className="card-list">
               {userProjects.map((project: any, index: number) => (
                 <div
                   key={index}
                   onClick={() => handleProjectClick(project.projectName)}
-                  className="p-2 cursor-pointer hover:bg-blue-100"
+                  className="card p-2 cursor-pointer hover:bg-blue-100"
                 >
-                  <li className="p-2 cursor-pointer hover:text-blue-900 hover:bg-gray-100">
-                    {project.projectName}
-                  </li>
+                  <div className="card-content">
+                    <h3 className="text-lg font-semibold text-blue-900 hover:bg-gray-100">
+                      {project.projectName}
+                    </h3>
+                    {/* <p className="text-sm text-gray-600 mt-1">
+                      {project.projectDescription}
+                    </p> */}
+                  </div>
                 </div>
               ))}
-            </ul>
+            </div>
           </div>
         </>
       )}

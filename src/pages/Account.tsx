@@ -9,7 +9,6 @@ const Account = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const userImage = params.get("userImage");
-  const [file, setFile] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user } = useAuth0();
   const [isImgDropdownOpen, setIsImgDropdownOpen] = useState(false);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TaskData } from "../../pages/Project";
 import { PriorityIconMap } from "../../pages/Project";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import SubTaskModal from "./subTaskModal";
+import SubTaskModal from "./SubTaskModal";
 import { ProjectDetails } from "../projectForm/ProjectCreationForm";
 import { useParams } from "react-router-dom";
 
@@ -49,6 +49,21 @@ const TaskList: React.FC<TaskListProps> = ({
     }
 
     setNewComment("");
+  };
+
+  const handleDeleteComment = (selectedTask: any, commentIndex: number) => {
+    let commentsString = localStorage.getItem(`comments_${selectedTask.id}`);
+    if (!commentsString) return;
+    let comments = JSON.parse(commentsString) || [];
+
+    // Remove the comment at the specified index
+    comments.splice(commentIndex, 1);
+
+    localStorage.setItem(
+      `comments_${selectedTask.id}`,
+      JSON.stringify(comments)
+    );
+    setComments([...comments]);
   };
 
   let projectDetails: ProjectDetails | null = null;
@@ -199,7 +214,10 @@ const TaskList: React.FC<TaskListProps> = ({
                                         <button
                                           className="text-red-500 hover:text-red-700 focus:outline-none transition duration-300 ease-in-out transform hover:scale-105 focus:text-red-700"
                                           onClick={() =>
-                                            handleDeleteComment(index)
+                                            handleDeleteComment(
+                                              selectedTask,
+                                              index
+                                            )
                                           }
                                         >
                                           Delete
@@ -415,7 +433,10 @@ const TaskList: React.FC<TaskListProps> = ({
                                         <button
                                           className="text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
                                           onClick={() =>
-                                            handleDeleteComment(index)
+                                            handleDeleteComment(
+                                              selectedTask,
+                                              index
+                                            )
                                           }
                                         >
                                           Delete
@@ -631,7 +652,10 @@ const TaskList: React.FC<TaskListProps> = ({
                                         <button
                                           className="text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
                                           onClick={() =>
-                                            handleDeleteComment(index)
+                                            handleDeleteComment(
+                                              selectedTask,
+                                              index
+                                            )
                                           }
                                         >
                                           Delete
