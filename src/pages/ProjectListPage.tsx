@@ -7,6 +7,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 const ProjectListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [projects, setProjects] = useState<{ key: string; details: any }[]>([]);
+  const [dropdownStates, setDropdownStates] = useState<{
+    [key: string]: boolean;
+  }>({});
   const { user } = useAuth0();
 
   useEffect(() => {
@@ -62,19 +65,11 @@ const ProjectListPage: React.FC = () => {
   };
 
   const handleMouseEnter = (key: string) => {
-    setProjects((prevProjects) =>
-      prevProjects.map((project) =>
-        project.key === key ? { ...project, isDropdownOpen: true } : project
-      )
-    );
+    setDropdownStates((prevState) => ({ ...prevState, [key]: true }));
   };
 
   const handleMouseLeave = (key: string) => {
-    setProjects((prevProjects) =>
-      prevProjects.map((project) =>
-        project.key === key ? { ...project, isDropdownOpen: false } : project
-      )
-    );
+    setDropdownStates((prevState) => ({ ...prevState, [key]: false }));
   };
 
   return (
@@ -121,8 +116,8 @@ const ProjectListPage: React.FC = () => {
                     onMouseEnter={() => handleMouseEnter(key)}
                     onMouseLeave={() => handleMouseLeave(key)}
                   >
-                    <BsPeople className="mr-2 text-blue-900 transition duration-300 ease-in-out transform hover:scale-105" />
-                    {details?.isDropdownOpen && (
+                    <BsPeople className="mr-2 text-blue-900 transition duration-300 ease-in-out hover:scale-105" />
+                    {dropdownStates[key] && (
                       <div className="absolute bg-white border border-gray-100 shadow-md rounded-md p-2">
                         <h3 className="font-bold text-blue-900 mb-3">
                           Project Members:

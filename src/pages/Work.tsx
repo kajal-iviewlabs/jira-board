@@ -40,7 +40,7 @@ const Work: React.FC = () => {
             {recentProjects.map((project, index) => (
               <div
                 key={index}
-                className="bg-white border border-gray-100 hover:border-blue-900 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-md p-6 hover:shadow-lg transition duration-300 max-w-xs"
+                className="bg-white border border-gray-100 hover:border-blue-900 transition duration-300 ease-in-out hover:scale-105 shadow-md rounded-md p-6 hover:shadow-lg transition duration-300 max-w-xs"
               >
                 <Link
                   to={`/project/${project.projectName}`}
