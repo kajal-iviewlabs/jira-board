@@ -158,7 +158,7 @@ const ProjectCreationForm: React.FC<{}> = () => {
 
         <button
           onClick={handleCreateProject}
-          className="w-full px-6 py-2 bg-blue-900 text-gray-100 rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
+          className="w-full px-6 py-2 bg-blue-900 text-gray-100 rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none"
         >
           Create Project
         </button>

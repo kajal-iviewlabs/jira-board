@@ -77,7 +77,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ onSubmit }) => {
       )}
       <button
         onClick={handleInvite}
-        className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
+        className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none"
       >
         Invite
       </button>

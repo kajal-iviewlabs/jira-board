@@ -178,14 +178,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="submit"
-              className="w-full inline-flex justify-center border-blue-900 hover:bg-blue-900 hover:text-gray-100 rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-blue-900 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+              className="w-full inline-flex justify-center border-blue-900 transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-900 hover:text-gray-100 rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-blue-900 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
               onClick={handleCreateTask}
             >
               Create Task
             </button>
             <button
               type="button"
-              className="mt-3 w-full border-blue-900 inline-flex justify-center rounded-md hover:bg-blue-900 hover:text-gray-100 border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-blue-900 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              className="mt-3 w-full border-blue-900 transition duration-300 ease-in-out transform hover:scale-105 inline-flex justify-center rounded-md hover:bg-blue-900 hover:text-gray-100 border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-blue-900 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
               onClick={onClose}
             >
               Cancel

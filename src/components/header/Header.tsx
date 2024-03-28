@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import HomeIcon from "../../assets/HomeIcon";
 import ArrowIcon from "../../assets/ArrowIcon";
 import ManageAccount from "../../assets/ManageAccount";
+import JiraSoftware from "../../assets/JiraSoftware";
 
 const Header = () => {
   const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
@@ -54,13 +55,18 @@ const Header = () => {
         <header className="header">
           <nav className="header-left">
             <div role="presentation">
-              <Link to="view">
+              <Link to="/">
                 <HomeIcon />
               </Link>
             </div>
             <div className="outer-menu">
+              <div className="div-btn mx-2">
+                <Link to="work">
+                  <JiraSoftware />
+                </Link>
+              </div>
               {/* Your Work */}
-              {/* <div role="listitem" className="div-btn">
+              <div role="listitem" className="div-btn">
                 <div className="inner-div">
                   <Link to="work" className="work">
                     Your work
@@ -69,7 +75,7 @@ const Header = () => {
                     <ArrowIcon />
                   </span>
                 </div>
-              </div> */}
+              </div>
 
               {/* Projects */}
               <div role="listitem" className="div-btn">

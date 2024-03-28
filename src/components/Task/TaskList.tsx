@@ -114,7 +114,7 @@ const TaskList: React.FC<TaskListProps> = ({
                         {...provided.dragHandleProps}
                         onClick={() => openTodoModal(task)}
                       >
-                        <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
+                        <div className="bg-white shadow-md rounded-md p-4 mb-4">
                           <p className="font-semibold text-blue-900">
                             Task Name: {task.taskName}
                           </p>
@@ -197,7 +197,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                           {comment}
                                         </p>
                                         <button
-                                          className="text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
+                                          className="text-red-500 hover:text-red-700 focus:outline-none transition duration-300 ease-in-out transform hover:scale-105 focus:text-red-700"
                                           onClick={() =>
                                             handleDeleteComment(index)
                                           }
@@ -225,7 +225,7 @@ const TaskList: React.FC<TaskListProps> = ({
                                     />
                                     <button
                                       onClick={handleAddComment}
-                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 border hover:border-blue-900 font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                                      className="mt-2 bg-blue-900 hover:bg-gray-100 text-gray-100 hover:text-blue-900 border hover:border-blue-900 font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring focus:border-blue-500"
                                     >
                                       Add Comment
                                     </button>
@@ -238,16 +238,40 @@ const TaskList: React.FC<TaskListProps> = ({
                                   Details
                                 </h2>
                                 <p className="text-sm text-gray-600 mt-2">
-                                  Reporter: {projectDetails?.projectOwner}
+                                  <span className="text-blue-900">
+                                    Reporter:
+                                  </span>
+                                  <span className="ml-2">
+                                    {projectDetails?.projectOwner}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Assignee: {selectedTask?.assignee}
+                                  <span className="text-blue-900">
+                                    Assignee:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.assignee}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Priority: {selectedTask?.priority}
+                                  <span className="text-blue-900">
+                                    Priority:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.priority}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Parent: {projectName}
+                                  <span className="text-blue-900">
+                                    Duration:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.duration} days
+                                  </span>
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  <span className="text-blue-900">Parent:</span>
+                                  <span className="ml-2">{projectName}</span>
                                 </p>
                               </div>
                             </div>
@@ -257,7 +281,7 @@ const TaskList: React.FC<TaskListProps> = ({
                             <button
                               type="button"
                               onClick={closeModal}
-                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 border border-gray-100 hover:border-blue-900 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                              className="w-full inline-flex justify-center rounded-md bg-blue-900 text-gray-100 hover:text-blue-900 hover:bg-gray-100 border border-gray-100 hover:border-blue-900 border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                             >
                               Close
                             </button>
@@ -307,7 +331,7 @@ const TaskList: React.FC<TaskListProps> = ({
                         {...provided.dragHandleProps}
                         onClick={() => openInProgressModal(task)}
                       >
-                        <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
+                        <div className="bg-white shadow-md rounded-md p-4 mb-4">
                           <p className="font-semibold">
                             Task Name: {task.taskName}
                           </p>
@@ -430,16 +454,40 @@ const TaskList: React.FC<TaskListProps> = ({
                                   Details
                                 </h2>
                                 <p className="text-sm text-gray-600 mt-2">
-                                  Reporter: {projectDetails?.projectOwner}
+                                  <span className="text-blue-900">
+                                    Reporter:
+                                  </span>
+                                  <span className="ml-2">
+                                    {projectDetails?.projectOwner}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Assignee: {selectedTask?.assignee}
+                                  <span className="text-blue-900">
+                                    Assignee:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.assignee}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Priority: {selectedTask?.priority}
+                                  <span className="text-blue-900">
+                                    Priority:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.priority}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Parent: {projectName}
+                                  <span className="text-blue-900">
+                                    Duration:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.duration} days
+                                  </span>
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  <span className="text-blue-900">Parent:</span>
+                                  <span className="ml-2">{projectName}</span>
                                 </p>
                               </div>
                             </div>
@@ -499,7 +547,7 @@ const TaskList: React.FC<TaskListProps> = ({
                         {...provided.dragHandleProps}
                         onClick={() => openDoneModal(task)}
                       >
-                        <div className="bg-white relative shadow-md rounded-md p-4 mb-4">
+                        <div className="bg-white shadow-md rounded-md p-4 mb-4">
                           <p className="font-semibold">
                             Task Name: {task.taskName}
                           </p>
@@ -622,16 +670,40 @@ const TaskList: React.FC<TaskListProps> = ({
                                   Details
                                 </h2>
                                 <p className="text-sm text-gray-600 mt-2">
-                                  Reporter: {projectDetails?.projectOwner}
+                                  <span className="text-blue-900">
+                                    Reporter:
+                                  </span>
+                                  <span className="ml-2">
+                                    {projectDetails?.projectOwner}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Assignee: {selectedTask?.assignee}
+                                  <span className="text-blue-900">
+                                    Assignee:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.assignee}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Priority: {selectedTask?.priority}
+                                  <span className="text-blue-900">
+                                    Priority:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.priority}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Parent: {projectName}
+                                  <span className="text-blue-900">
+                                    Duration:
+                                  </span>
+                                  <span className="ml-2">
+                                    {selectedTask?.duration} days
+                                  </span>
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  <span className="text-blue-900">Parent:</span>
+                                  <span className="ml-2">{projectName}</span>
                                 </p>
                               </div>
                             </div>
