@@ -98,7 +98,7 @@ const ProjectListPage: React.FC = () => {
                 .toLowerCase()
                 .includes(searchTerm.toLowerCase())
             )
-            .map(({ key, details, isDropdownOpen }) => (
+            .map(({ key, details }) => (
               <div
                 key={key}
                 className="bg-white border border-gray-100 hover:border-blue-900 transition duration-300 ease-in-out hover:scale-105 shadow-md rounded-md p-6 hover:shadow-lg transition duration-300 h-50"
@@ -122,7 +122,7 @@ const ProjectListPage: React.FC = () => {
                     onMouseLeave={() => handleMouseLeave(key)}
                   >
                     <BsPeople className="mr-2 text-blue-900 transition duration-300 ease-in-out transform hover:scale-105" />
-                    {isDropdownOpen && (
+                    {details?.isDropdownOpen && (
                       <div className="absolute bg-white border border-gray-100 shadow-md rounded-md p-2">
                         <h3 className="font-bold text-blue-900 mb-3">
                           Project Members:

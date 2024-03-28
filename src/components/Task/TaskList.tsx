@@ -51,9 +51,10 @@ const TaskList: React.FC<TaskListProps> = ({
     setNewComment("");
   };
 
-  const handleDeleteComment = (selectedTask, commentIndex) => {
-    const comments =
-      JSON.parse(localStorage.getItem(`comments_${selectedTask.id}`)) || [];
+  const handleDeleteComment = (selectedTask: any, commentIndex: number) => {
+    let commentsString = localStorage.getItem(`comments_${selectedTask.id}`);
+    if (!commentsString) return;
+    let comments = JSON.parse(commentsString) || [];
 
     // Remove the comment at the specified index
     comments.splice(commentIndex, 1);
@@ -62,6 +63,7 @@ const TaskList: React.FC<TaskListProps> = ({
       `comments_${selectedTask.id}`,
       JSON.stringify(comments)
     );
+    setComments([...comments]);
   };
 
   let projectDetails: ProjectDetails | null = null;
@@ -431,7 +433,10 @@ const TaskList: React.FC<TaskListProps> = ({
                                         <button
                                           className="text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
                                           onClick={() =>
-                                            handleDeleteComment(index)
+                                            handleDeleteComment(
+                                              selectedTask,
+                                              index
+                                            )
                                           }
                                         >
                                           Delete
@@ -647,7 +652,10 @@ const TaskList: React.FC<TaskListProps> = ({
                                         <button
                                           className="text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
                                           onClick={() =>
-                                            handleDeleteComment(index)
+                                            handleDeleteComment(
+                                              selectedTask,
+                                              index
+                                            )
                                           }
                                         >
                                           Delete
