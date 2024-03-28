@@ -13,7 +13,7 @@ const SubTaskModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex">
       <div className="relative p-8 bg-white w-96 mx-auto my-auto rounded-lg">
         <button
-          className="absolute top-0 right-0 m-4 text-xl font-bold text-gray-500 cursor-pointer"
+          className="absolute top-0 right-0 m-4 text-xl font-bold transition duration-300 ease-in-out transform hover:scale-105 text-gray-500 cursor-pointer"
           onClick={onClose}
         >
           &times;

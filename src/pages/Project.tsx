@@ -284,7 +284,7 @@ const ProjectPage: React.FC = () => {
             </h1>
             <button
               onClick={handleOpenTaskModal}
-              className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
+              className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border transition duration-300 ease-in-out transform hover:scale-105 border-blue-900 focus:outline-none"
             >
               Create Task
             </button>

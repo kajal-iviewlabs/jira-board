@@ -5,6 +5,7 @@ import ProjectCreationForm from "../projectForm/ProjectCreationForm";
 import Home from "../../pages/Home";
 import PrivateRoute from "./PrivateRoute";
 import Account from "../../pages/Account";
+import Work from "../../pages/Work";
 
 const Layout = () => {
   return (
@@ -15,6 +16,7 @@ const Layout = () => {
         <Route path="/project/:projectName" element={<ProjectPage />} />
         <Route path="/view" element={<ProjectListPage />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/work" element={<Work />} />
       </Route>
     </Routes>
   );

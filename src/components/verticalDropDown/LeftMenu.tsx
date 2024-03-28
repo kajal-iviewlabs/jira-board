@@ -95,7 +95,7 @@ const LeftMenu = () => {
                   onClick={() => handleProjectClick(project.projectName)}
                   className="p-2 cursor-pointer hover:bg-blue-100"
                 >
-                  <li className="p-2 cursor-pointer hover:text-blue-900">
+                  <li className="p-2 cursor-pointer hover:text-blue-900 hover:bg-gray-100">
                     {project.projectName}
                   </li>
                 </div>
