@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link } from "react-router-dom";
 
@@ -42,7 +42,7 @@ const Home = () => {
   } else {
     return (
       <div className="content">
-        <div className="card">
+        <div className="card p-10">
           <h2 className="text-2xl font-semibold mb-4">Welcome to Our App!</h2>
           <p className="text-lg mb-4">
             Our app is designed to help you manage projects efficiently and
@@ -53,7 +53,7 @@ const Home = () => {
           </p>
           <button
             onClick={handleLogin}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none"
+            className="hover:bg-gray-100 bg-blue-900 text-gray-100 border hover:border-blue-900 hover:text-blue-900 font-bold py-2 px-4 rounded focus:outline-none"
           >
             Log In
           </button>

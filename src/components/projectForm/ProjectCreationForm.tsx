@@ -87,7 +87,6 @@ const ProjectCreationForm: React.FC<{}> = () => {
 
       navigate(`/project/${projectName}`, { state: { projectDetails } });
     } catch (error) {
-      console.error("Error storing project details:", error);
       alert("An error occurred while storing project details");
     }
   };

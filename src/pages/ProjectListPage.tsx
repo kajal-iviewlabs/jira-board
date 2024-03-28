@@ -24,7 +24,7 @@ const ProjectListPage: React.FC = () => {
         const projectDetails = projectKeys.map((key) => ({
           key,
           details: data[key],
-          isDropdownOpen: false, // Add isDropdownOpen state for each project
+          isDropdownOpen: false,
         }));
         setProjects(projectDetails);
       } catch (error) {
@@ -34,6 +34,28 @@ const ProjectListPage: React.FC = () => {
 
     fetchProjects();
   }, [user]);
+
+  const storeRecentProject = async (projectDetails: any) => {
+    let recentProjects = JSON.parse(
+      localStorage.getItem("recentProjects") || "[]"
+    );
+
+    // Check if the project already exists in the recent projects list
+    const existingProjectIndex = recentProjects.findIndex(
+      (project: any) => project.projectName === projectDetails.projectName
+    );
+
+    if (existingProjectIndex !== -1) {
+      // If the project exists, remove it from its current position
+      recentProjects.splice(existingProjectIndex, 1);
+    }
+
+    // Add the latest clicked project at the beginning of the recent projects list
+    recentProjects = [projectDetails, ...recentProjects.slice(0, 9)];
+
+    // Update localStorage with the updated recent projects list
+    localStorage.setItem("recentProjects", JSON.stringify(recentProjects));
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -84,6 +106,7 @@ const ProjectListPage: React.FC = () => {
                 <Link
                   to={`/project/${details.projectName}`}
                   className="text-blue-900 hover:underline flex items-center mb-2"
+                  onClick={() => storeRecentProject(details)}
                 >
                   <FaTasks className="mr-2" />
                   <h2 className="text-xl font-semibold truncate">
@@ -121,7 +144,7 @@ const ProjectListPage: React.FC = () => {
                             <div key={index} className="flex p-2 items-center">
                               <div className="mr-3 bg-blue-900 text-white rounded-full h-8 w-8 flex items-center justify-center">
                                 <BsPerson size={22} />
-                              </div>{" "}
+                              </div>
                               <div>
                                 <span>{person}</span>
                                 <span className="text-gray-400 text-xs block overflow-hidden truncate whitespace-nowrap">
