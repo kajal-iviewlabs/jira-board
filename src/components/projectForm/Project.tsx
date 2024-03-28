@@ -1,4 +1,3 @@
-import React from "react";
 import "./project.css";
 import { Link } from "react-router-dom";
 

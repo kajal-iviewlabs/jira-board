@@ -1,4 +1,3 @@
-// ProjectListItem.tsx
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -7,6 +6,8 @@ interface ProjectListItemProps {
 }
 
 const ProjectListItem: React.FC<ProjectListItemProps> = ({ projectName }) => {
+  // const projectDetails = projectName ? localStorage.getItem(projectName) : null;
+
   return (
     <li className="mb-2">
       <Link

@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import InviteForm from "../components/invitePeople/InviteForm";
-import TaskModal from "../components/projectForm/TaskModal";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
+import InviteForm from "../components/Task/InviteForm";
+import TaskModal from "../components/Task/TaskModal";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { FaExclamationCircle, FaRegCircle, FaCircle } from "react-icons/fa";
+import { database } from "../firebaseConfig";
+import { ref, update, onValue } from "firebase/database";
+import { useAuth0 } from "@auth0/auth0-react";
+import TaskList from "../components/Task/TaskList";
+import { ProjectDetails } from "../components/projectForm/ProjectCreationForm";
+import emailjs from "@emailjs/browser";
 
-interface TaskData {
+declare global {
+  interface Window {
+    Email: any;
+  }
+}
+
+export interface TaskData {
   id: string;
   taskName: string;
   description: string;
@@ -17,6 +25,10 @@ interface TaskData {
   assignee: string;
   duration: string;
   status: string;
+}
+
+export interface PriorityIconMap {
+  [key: string]: any;
 }
 
 const ProjectPage: React.FC = () => {
@@ -27,36 +39,133 @@ const ProjectPage: React.FC = () => {
   const [progressData, setProgressData] = useState<TaskData[]>([]);
   const [completedData, setCompletedData] = useState<TaskData[]>([]);
   const taskListRef = useRef<HTMLDivElement>(null);
-  const projectDetails = projectName ? localStorage.getItem(projectName) : null;
+  const [projectKey, setProjectKey] = useState<string>("");
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(
+    null
+  );
+  const priorityIconMap: PriorityIconMap = {
+    high: <FaExclamationCircle color="red" />,
+    medium: <FaRegCircle color="orange" />,
+    low: <FaCircle color="green" />,
+  };
+  const { user } = useAuth0();
 
   useEffect(() => {
-    if (projectName) {
-      const projectDetailsString = localStorage.getItem(projectName);
-      if (projectDetailsString) {
-        const projectDetails = JSON.parse(projectDetailsString);
-        setInvitedEmails(projectDetails.invitedEmails || []);
-        setTaskData(projectDetails.taskData || []);
-      }
-    }
-  }, [projectName]);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `https://project-management-tool-2dcae-default-rtdb.firebaseio.com/${user?.name}.json`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch project details");
+        }
+        const data = await response.json();
 
-  const handleInvite = (email: string) => {
+        const userProjects = [];
+        for (const key in data) {
+          if (Object.prototype.hasOwnProperty.call(data, key)) {
+            const nestedObject = data[key];
+            if (nestedObject.projectName === projectName) {
+              setProjectDetails(nestedObject);
+              setProjectKey(key);
+              setTaskData(nestedObject.taskData || []);
+              // break;
+            }
+
+            if (
+              nestedObject.invitedEmails.some(
+                (email: any) => email === user?.email
+              )
+            ) {
+              userProjects.push(nestedObject);
+            }
+          }
+        }
+        localStorage.setItem(user?.email || "", JSON.stringify(userProjects));
+      } catch (error) {
+        console.error("Error fetching project details:", error);
+      }
+    };
+    if (projectName) {
+      fetchData();
+    }
+  }, [projectName, user?.name, invitedEmails]);
+
+  useEffect(() => {
+    if (projectKey) {
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+      const unsubscribe = onValue(projectRef, (snapshot) => {
+        const projectData = snapshot.val();
+        if (projectData) {
+          setProjectDetails(projectData);
+          setTaskData(projectData.taskData || []);
+          setProgressData(projectData.inProgressData || []);
+          setCompletedData(projectData.doneData || []);
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [projectKey, user?.name]);
+
+  useEffect(() => {
+    if (projectDetails) {
+      localStorage.setItem("projectDetails", JSON.stringify(projectDetails));
+    }
+  }, [projectDetails]);
+
+  const handleInvite = async (email: string) => {
     setInvitedEmails((prevInvitedEmails) => [...prevInvitedEmails, email]);
 
-    if (projectName) {
-      const projectDetailsString = localStorage.getItem(projectName);
-      if (projectDetailsString) {
-        const projectDetails = JSON.parse(projectDetailsString);
-        const updatedProjectDetails = {
-          ...projectDetails,
-          invitedEmails: [...projectDetails.invitedEmails, email],
-        };
-        localStorage.setItem(
-          projectName,
-          JSON.stringify(updatedProjectDetails)
-        );
-      }
+    if (projectDetails && projectKey) {
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+      const updatedProjectDetails = {
+        ...projectDetails,
+        invitedEmails: [...projectDetails.invitedEmails, email],
+      };
+
+      update(projectRef, updatedProjectDetails)
+        .then(() => {
+          console.log("Project details updated successfully.");
+        })
+        .catch((error) => {
+          console.error("Error updating project details:", error);
+        });
     }
+    // const config = {
+    //   Host: "smtp.elasticemail.com",
+    //   Username: "kajal.kapadiya@iviewlabs.net",
+    //   Password: "84A31FCAFEFDF25E210C83198E7EC4275570",
+    //   To: email,
+    //   From: user?.email,
+    //   Subject: "This is the subject",
+    //   Body: "And this is the body",
+    // };
+
+    // if (window.Email) {
+    //   window.Email.send(config).then(() => {
+    //     alert("email sent successfully");
+    //   });
+    // }
+
+    emailjs
+      .send("service_44y5zre", "template_enq9pk3", {
+        to_name: email,
+        message_html: "This is the message body",
+        from_name: user?.email,
+        reply_to: user?.email,
+        publicKey: "s-Tg1LAk5W85f0jtP",
+      })
+      .then(
+        (response) => {
+          console.log("SUCCESS!", response.status, response.text);
+        },
+        (error) => {
+          console.log("FAILED...", error);
+        }
+      );
   };
 
   const handleOpenTaskModal = () => {
@@ -68,20 +177,29 @@ const ProjectPage: React.FC = () => {
   };
 
   const handleTaskSubmission = (newTaskData: TaskData) => {
-    setTaskData((prevTaskData) => [...prevTaskData, newTaskData]);
+    console.log("Project Key:", projectKey);
+    console.log("Project Details:", projectDetails);
 
-    if (projectName) {
-      const projectDetailsString = localStorage.getItem(projectName);
-      if (projectDetailsString) {
-        const existingProjectDetails = JSON.parse(projectDetailsString);
-        const updatedLocalStorage = {
-          ...existingProjectDetails,
-          taskData: [...existingProjectDetails.taskData, newTaskData],
-        };
-        localStorage.setItem(projectName, JSON.stringify(updatedLocalStorage));
-      }
+    const updatedTaskData = [...taskData, newTaskData];
+    setTaskData(updatedTaskData);
+
+    if (projectKey && projectDetails) {
+      const updatedProjectDetails = {
+        ...projectDetails,
+        taskData: [...updatedTaskData],
+      };
+      setProjectDetails(updatedProjectDetails);
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+
+      update(projectRef, updatedProjectDetails)
+        .then(() => {
+          console.log("Task data updated successfully.");
+        })
+        .catch((error) => {
+          console.error("Error updating task data:", error);
+        });
     } else {
-      console.error("Project name is undefined.");
+      console.error("Project key or project details is undefined.");
     }
 
     // Scroll to bottom
@@ -93,7 +211,7 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
     if (!destination) return;
     if (
@@ -103,52 +221,52 @@ const ProjectPage: React.FC = () => {
       return;
     }
 
+    let updatedTaskData = [...taskData];
+    let updatedProgressData = [...progressData];
+    let updatedCompletedData = [...completedData];
+    const draggedTask = updatedTaskData[source.index];
+
     // Remove the task from the source droppable area
-    let currentData,
-      active = taskData,
-      progress = progressData,
-      complete = completedData;
-
     if (source.droppableId === "todo") {
-      currentData = active[source.index];
-      active.splice(source.index, 1);
+      updatedTaskData.splice(source.index, 1);
     } else if (source.droppableId === "inProgress") {
-      currentData = progress[source.index];
-      progress.splice(source.index, 1);
+      updatedProgressData.splice(source.index, 1);
     } else {
-      currentData = complete[source.index];
-      complete.splice(source.index, 1);
+      updatedCompletedData.splice(source.index, 1);
     }
 
+    // Add the task to the destination droppable area
     if (destination.droppableId === "todo") {
-      active.splice(destination.index, 0, currentData);
+      draggedTask.status = "todo";
+      updatedTaskData.splice(destination.index, 0, draggedTask);
     } else if (destination.droppableId === "inProgress") {
-      progress.splice(destination.index, 0, currentData);
+      draggedTask.status = "inProgress";
+      updatedProgressData.splice(destination.index, 0, draggedTask);
     } else {
-      complete.splice(destination.index, 0, currentData);
+      draggedTask.status = "done";
+      updatedCompletedData.splice(destination.index, 0, draggedTask);
     }
 
-    setTaskData(active);
-    setProgressData(progress);
-    setCompletedData(complete);
+    // Update the state for all lists
+    setTaskData(updatedTaskData);
+    setProgressData(updatedProgressData);
+    setCompletedData(updatedCompletedData);
 
-    // Update the task's status based on the destination droppable area
-    // switch (destination.droppableId) {
-    //   case "todo":
-    //     active = { ...draggedTask, status: "todo" };
-    //     break;
-    //   case "inProgress":
-    //     updatedTask = { ...draggedTask, status: "inProgress" };
-    //     break;
-    //   case "done":
-    //     updatedTask = { ...draggedTask, status: "done" };
-    //     break;
-    //   default:
-    //     updatedTask = draggedTask;
-    // }
+    // Update Firebase data
+    try {
+      const projectRef = ref(database, `${user?.name}/${projectKey}`);
+      const updatedProjectDetails = {
+        ...projectDetails!,
+        taskData: [...updatedTaskData],
+        inProgressData: [...updatedProgressData],
+        doneData: [...updatedCompletedData],
+      };
+      await update(projectRef, updatedProjectDetails);
+      console.log("Firebase data updated successfully.");
+    } catch (error) {
+      console.error("Error updating Firebase data:", error);
+    }
   };
-
-  console.log(projectDetails);
 
   return (
     <div
@@ -156,176 +274,34 @@ const ProjectPage: React.FC = () => {
       style={{ width: "100%" }}
     >
       <div
-        className="mx-auto bg-white justify-center h-full items-center rounded-md shadow-md overflow-hidden"
+        className="mx-auto bg-white justify-center h-screen items-center rounded-md shadow-md overflow-hidden"
         style={{ width: "200%" }}
       >
         <div className="p-6">
           <div className="flex justify-between items-center gap-10">
-            <h1 className="text-2xl font-bold mb-4">{projectName}</h1>
+            <h1 className="text-2xl text-blue-900 font-bold mb-4">
+              {projectName}
+            </h1>
             <button
               onClick={handleOpenTaskModal}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="font-bold py-2 px-10 bg-blue-900 text-gray-100 text-white rounded-md hover:bg-gray-100 hover:text-blue-900 hover:border border-blue-900 focus:outline-none"
             >
               Create Task
             </button>
           </div>
-          <p className="mb-4">
-            {projectDetails
-              ? JSON.parse(projectDetails).projectDescription
-              : ""}
+          <p className="mb-4 mt-4">
+            {projectDetails ? projectDetails.projectDescription : ""}
           </p>
           <InviteForm onSubmit={handleInvite} />
         </div>
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-3 gap-4 mx-6 rounded-md">
-            <Droppable droppableId="todo">
-              {(provided) => (
-                <div
-                  className="col-span-1"
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  <div
-                    className="bg-gray-100 py-4 px-6"
-                    style={{
-                      maxHeight: "50vh",
-                      overflowY: "auto",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                    ref={taskListRef}
-                  >
-                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
-                      To Do:
-                    </h2>
-                    {taskData.map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <div className="bg-white shadow-md rounded-md p-4 mb-4">
-                              <p className="font-semibold">
-                                Task Name: {task.taskName}
-                              </p>
-                              <p>Description: {task.description}</p>
-                              <p>Priority: {task.priority}</p>
-                              <p>Duration: {task.duration}</p>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                </div>
-              )}
-            </Droppable>
-            <Droppable droppableId="inProgress">
-              {(provided) => (
-                <div
-                  className="col-span-1"
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  <div
-                    className="bg-gray-100 py-4 px-6"
-                    style={{
-                      maxHeight: "50vh",
-                      overflowY: "auto",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  >
-                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
-                      In Progress:
-                    </h2>
-                    {progressData?.map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <div className="bg-white shadow-md rounded-md p-4 mb-4">
-                              <p className="font-semibold">
-                                Task Name: {task.taskName}
-                              </p>
-                              <p>Description: {task.description}</p>
-                              <p>Priority: {task.priority}</p>
-                              <p>Assignee: {task.assignee}</p>
-                              <p>Duration: {task.duration}</p>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                </div>
-              )}
-            </Droppable>
-            <Droppable droppableId="done">
-              {(provided) => (
-                <div
-                  className="col-span-1"
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  <div
-                    className="bg-gray-100 py-4 px-6"
-                    style={{
-                      maxHeight: "50vh",
-                      overflowY: "auto",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  >
-                    <h2 className="text-lg font-semibold mb-4 border-b-2 border-gray-300 pb-2">
-                      Done:
-                    </h2>
-                    {completedData?.map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <div className="bg-white shadow-md rounded-md p-4 mb-4">
-                              <p className="font-semibold">
-                                Task Name: {task.taskName}
-                              </p>
-                              <p>Description: {task.description}</p>
-                              <p>Priority: {task.priority}</p>
-                              <p>Assignee: {task.assignee}</p>
-                              <p>Duration: {task.duration}</p>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                </div>
-              )}
-            </Droppable>
-          </div>
+          <TaskList
+            taskData={taskData}
+            progressData={progressData}
+            completedData={completedData}
+            taskListRef={taskListRef}
+            priorityIconMap={priorityIconMap}
+          />
         </DragDropContext>
       </div>
       {isTaskModalOpen && (
